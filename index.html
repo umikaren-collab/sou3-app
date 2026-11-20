@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>中間テスト対策 2時間セット</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Klee+One:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#fbfcfe; --grid:#dfe8f3; --ink:#1f3a5f; --soft:#5b6f8a; --red:#c8322c;
+  --line:#c9d6e6; --field:#ffffff;
+  --jp:#b85c7a; --ma:#2f7bbf; --en:#d08a1e; --sc:#3a8f5b; --so:#7a5cb0;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; color:var(--ink); background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+  font-family:"BIZ UDPGothic","Hiragino Sans","Noto Sans JP",sans-serif; font-size:17px; line-height:1.7;
+}
+header{max-width:820px;margin:0 auto;padding:28px 20px 8px}
+h1{font-family:"Klee One","BIZ UDPGothic",serif;font-weight:600;font-size:clamp(26px,5vw,36px);margin:0;line-height:1.3}
+.lead{color:var(--soft);margin:6px 0 0;font-size:15px}
+.sets{display:flex;gap:8px;margin:18px 0 0;flex-wrap:wrap}
+.sets button{font:inherit;font-size:15px;border:2px solid var(--ink);background:var(--field);color:var(--ink);padding:8px 14px;border-radius:6px;cursor:pointer}
+.sets button[aria-selected="true"]{background:var(--ink);color:#fff}
+main{max-width:820px;margin:0 auto;padding:8px 20px 140px}
+.plan{background:var(--field);border:1px solid var(--line);border-radius:6px;padding:12px 16px;margin:14px 0 22px;font-size:15px}
+.plan ol{margin:6px 0 0;padding-left:1.4em}
+section.sec{position:relative;background:var(--field);border:1px solid var(--line);border-left:10px solid var(--c);border-radius:4px 8px 8px 4px;margin:0 0 26px;padding:14px 18px 8px}
+.sec h2{font-family:"Klee One","BIZ UDPGothic",serif;font-weight:600;font-size:22px;margin:0;line-height:1.4}
+.sec .meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:4px 0 8px;color:var(--soft);font-size:14px}
+.tag{background:var(--c);color:#fff;border-radius:3px;padding:1px 8px;font-size:13px}
+.timer{margin-left:auto;display:flex;align-items:center;gap:6px}
+.timer output{font-variant-numeric:tabular-nums;font-size:18px;color:var(--ink);min-width:4.2em;text-align:right}
+.timer output.over{color:var(--red)}
+.timer button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:4px;padding:3px 10px;cursor:pointer}
+.note{font-size:14px;color:var(--soft);margin:0 0 8px}
+.q{border-top:1px dashed var(--line);padding:10px 0}
+.q:first-of-type{border-top:0}
+.qt{margin:0 0 6px}
+.qt b{display:inline-block;min-width:2em;color:var(--c)}
+.row{display:flex;gap:10px;align-items:center}
+.row input[type=search],.row textarea{-webkit-appearance:none;appearance:none;flex:1;font:inherit;font-size:17px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-bottom:2px solid var(--ink);border-radius:3px;padding:6px 10px;min-width:0}
+.row textarea{min-height:5.2em;resize:vertical}
+input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-decoration{-webkit-appearance:none;display:none}
+label.unsure{font-size:13px;color:var(--soft);white-space:nowrap;display:flex;align-items:center;gap:4px;cursor:pointer}
+label.unsure input{accent-color:var(--red);width:18px;height:18px}
+input:focus-visible,textarea:focus-visible,button:focus-visible{outline:3px solid var(--c,var(--ma));outline-offset:2px}
+.done{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 0}
+.done button{font:inherit;border-radius:6px;padding:10px 16px;cursor:pointer;border:2px solid var(--red);background:var(--red);color:#fff}
+.done button.ghost{background:var(--field);color:var(--soft);border-color:var(--line)}
+#exportBox{width:100%;min-height:12em;margin-top:10px;font:14px/1.5 "BIZ UDPGothic",sans-serif;display:none}
+.pad{position:fixed;left:0;right:0;bottom:0;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));background:rgba(31,58,95,.96);display:none;justify-content:center;gap:6px;flex-wrap:wrap;z-index:5}
+.pad.on{display:flex}
+.pad button{font:inherit;font-size:18px;min-width:44px;height:40px;border:0;border-radius:6px;background:#fff;color:var(--ink);cursor:pointer}
+.saved{font-size:13px;color:var(--soft)}
+
+.handnote{flex:1;color:var(--soft);font-size:14px;border-bottom:2px dashed var(--line);padding:6px 4px}
+.howto{margin:8px 0 0;font-size:14px;color:var(--soft)}
+.score{font-weight:700;color:var(--ink)}
+.secfoot{display:flex;justify-content:flex-end;padding:8px 0 6px}
+.secfoot button{font:inherit;font-size:14px;border:2px solid var(--c);background:var(--field);color:var(--ink);border-radius:6px;padding:6px 14px;cursor:pointer}
+.res{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px;font-size:15px}
+.res .badge{font-weight:700;min-width:3.2em;text-align:center;border-radius:4px;padding:1px 6px;color:#fff}
+.res.ok .badge{background:#2e8b57}.res.ng .badge{background:var(--red)}.res.chk .badge{background:#b8860b}
+.res .key{flex:1;min-width:12em}
+.res.ng .key{color:var(--red)}
+.ov button{font:inherit;font-size:14px;width:34px;height:30px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:4px;cursor:pointer;margin-left:4px}
+.peek{font:inherit;font-size:13px;border:1px dashed var(--line);background:transparent;color:var(--soft);border-radius:4px;padding:2px 8px;cursor:pointer}
+.redo{margin-top:6px}.redo input{border-bottom-color:var(--red)!important}.redo-r{font-size:14px;min-width:6em;color:var(--soft)}
+.anabox{background:var(--field);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-top:16px;overflow-x:auto}
+.anabox h3,.anabox h4{margin:0 0 8px;font-family:"Klee One","BIZ UDPGothic",serif;font-weight:600}
+.anabox h4{margin-top:14px}
+.anabox table{border-collapse:collapse;width:100%;font-size:15px}
+.anabox th,.anabox td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;white-space:nowrap}
+.bar{display:inline-block;width:70px;height:8px;border-radius:4px;margin-right:8px;vertical-align:middle;background:linear-gradient(90deg,var(--ma) var(--p),var(--grid) var(--p))}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--paper:#16202c;--grid:#1f2c3b;--ink:#e4ecf5;--soft:#9fb2c8;--line:#34465c;--field:#1b2735}
+}
+:root[data-theme="dark"]{--paper:#16202c;--grid:#1f2c3b;--ink:#e4ecf5;--soft:#9fb2c8;--line:#34465c;--field:#1b2735}
+@media (max-width:560px){body{font-size:16px}.timer{margin-left:0}section.sec{padding:12px 12px 6px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>中間テスト対策 2時間セット</h1>
+  <p class="lead">答えは自動で保存されます。単元が終わったら採点し、×の問題はその場でやり直せます。最後に「分析データをコピー」を押して、チャットに貼り付けてください。</p>
+  <div class="sets" role="tablist" id="setTabs"></div>
+</header>
+<main id="main"></main>
+<div class="pad" id="pad" aria-label="記号入力"></div>
+
+<script>
+const SETS=[
+{ id:"d1", tab:"9/27(日)　5教科 各50分",
+  plan:["国語 50分（漢字15・語句10・読解15・読みと意味10）","数学 50分（√の計算15・有理化と性質15・二次方程式20）","英語 50分（単語10・時制10・並べかえ10・英作文10・読解10）","理科 50分（イオン式12・電池13・中和13・圧力と力12）","社会 50分（戦争への道15・戦後と冷戦15・高度成長〜現代10・公民10）"],
+  secs:[
+  {id:"jp1",sub:"国語",c:"--jp",t:"漢字の書き取り（ノートに手書き）",min:15,hand:1,note:"入力欄はありません。変換で答えが出てしまうので、ノートに番号をつけて手で書く。書き終わったら「答えを見る」を押して、1問ずつ ○／× を付ける。とめ・はね・送りがなまで正しければ○。",qs:[
+   "ユウソウな音楽が流れる。","海にモグる。","駅までのキョリを測る。","オウベイの文化にふれる。","犬をクサリでつなぐ。",
+   "カンサンとした商店街。","チクサンが盛んな地域。","ツヤのある果物。","高いヘイに囲まれる。","お使いのダチンをもらう。",
+   "イクドも挑戦する。","地面にヒザをつく。","風にユレル草木。","アザやかな色彩。","友人をショウカイする。",
+   "知識をチクセキする。","自由にカイシャクする。","ヒサンな運命。","話をコチョウして伝える。","文章のボウトウを読む。"]},
+  {id:"jp2",sub:"国語",c:"--jp",t:"類義語・対義語・語の種類",min:10,note:"類義語は「＝」、対義語は「↔」。漢字二字で答える。",qs:[
+   "不服 ＝ （　　）","希望 ＝ （　　）","欠点 ＝ （　　）","方法 ＝ （　　）","関心 ＝ （　　）",
+   "服従 ↔ （　　）","主観 ↔ （　　）","具体 ↔ （　　）","原因 ↔ （　　）","慎重 ↔ （　　）",
+   "「決まり」は和語・漢語・外来語のどれか。","「規則」は和語・漢語・外来語のどれか。","「ルール」は和語・漢語・外来語のどれか。",
+   "「本箱（ほんばこ）」は重箱読み・湯桶読みのどちらか。","「手本（てほん）」は重箱読み・湯桶読みのどちらか。","「台所（だいどころ）」は重箱読み・湯桶読みのどちらか。"]},
+  {id:"jp3",sub:"国語",c:"--jp",t:"読解・記述（故郷／作られた「物語」を超えて／俳句）",min:15,note:"教科書の内容を思い出して答える。記述は字数を守る。",qs:[
+   "「故郷」の作者は誰か。",
+   "「故郷」で「私」が故郷に帰ってきた季節は何か。",
+   "「故郷」で「私」が今回帰郷したのは何のためか。簡潔に書け。",
+   "「私」の幼なじみで、再会したとき「私」を「旦那さま」と呼んだ人物の名前を書け。",
+   "「私」のおい（甥）の名前と、ルントウの息子の名前をそれぞれ書け。",
+   "「故郷」の最後で「私」が考えた「希望」として適切なものを選べ。\nア 希望は必ずかなうものである\nイ 希望はもともとあるともないともいえず、多くの人が求めることで実現に近づく\nウ 希望は若い世代とは関係がない\nエ 希望は偶像にすぎず意味がない",
+   {q:"「故郷」で、古い家の屋根に枯れ草がなびいている様子から、一家のどんな事情が読み取れるか。30字以内で書け。",long:1},
+   {q:"「作られた『物語』を超えて」で、筆者は誤解を解くためにどのような態度が必要だと述べているか。「相手の立場」「常識」という言葉を使って40〜50字で書け。",long:1},
+   "「古池や蛙飛びこむ水の音」（松尾芭蕉）の季語と季節を書け。",
+   "上の句の切れ字を書け。",
+   "自由律俳句とはどのような俳句か。簡潔に書け。"]},
+  {id:"jp4",sub:"国語",c:"--jp",t:"漢字の読みと語句の意味",min:10,note:"読みはひらがなで。意味は記号で答える。",qs:[
+   "凶暴","襲われる","頑丈","眺める","巡らす","行き交う","紺色","溺愛","崇拝","偶像",
+   "「名残惜しい」の意味\nア 別れるのがつらい　イ どうしようもない　ウ 丁寧に接する",
+   "「脚色」の意味\nア 事実に創作を加えておもしろくすること　イ 大きくすること　ウ ためていくこと",
+   "「飛躍的に」の意味\nア 少しずつ　イ 急に大きく進歩するさま　ウ そこからなくすさま",
+   "「わびしい」の意味\nア まとまりのない　イ さびしく粗末な　ウ 明るくにぎやかな"]},
+  {id:"ma1",sub:"数学",c:"--ma",t:"√をふくむ計算",min:15,note:"途中式はノートに。ここには答えだけ入力（下のボタンで √ や ² を入れられます）。",qs:[
+   "√12 ＋ √27","√50 − √18 ＋ √8","√45 − √20 ＋ √5","3√6 − √24 ＋ √54","√48 − 6/√3",
+   "(√5 ＋ 2)²","(√3 − √2)²","(√7 ＋ 3)(√7 − 3)","(2√3 ＋ 1)(√3 − 2)","(√6 ＋ 2)(√6 − 5)"]},
+  {id:"ma2",sub:"数学",c:"--ma",t:"有理化・平方根の性質・式の値",min:15,note:"分数は 3/2 のように「/」で入力。答えはいちばん簡単な形に。",qs:[
+   "6/√2 を有理化せよ","√5/(2√3) を有理化せよ","3/√12 を有理化せよ","10/√5 を有理化せよ",
+   "3 ＜ √a ＜ 4 を満たす整数 a は何個あるか","√(20n) が自然数となる最も小さい自然数 n","√(18 − n) が整数となる自然数 n をすべて求めよ","√7 の整数部分と小数部分をそれぞれ求めよ",
+   "x ＝ √3 ＋ 1、y ＝ √3 − 1 のとき、x² − y² の値","x ＝ √5 − 2 のとき、x² ＋ 4x ＋ 4 の値"]},
+  {id:"ma3",sub:"数学",c:"--ma",t:"二次方程式",min:20,note:"解が2つあるときは「5, −2」のようにカンマで区切る。解の公式の答えは約分まで。",qs:[
+   "x(x − 3) ＝ 10","(x ＋ 2)² ＝ 3(x ＋ 2)","2x² ＋ 4x − 1 ＝ 0","3x² − 5x ＋ 1 ＝ 0","x² ＋ 6x − 1 ＝ 0",
+   "x² ＋ ax − 12 ＝ 0 の解の1つが 3 のとき、a の値ともう1つの解",
+   "連続する2つの自然数があり、その積は156である。この2つの自然数を求めよ。",
+   "縦が横より3cm長い長方形の面積が40cm²である。横の長さを求めよ。"]},
+  {id:"en1",sub:"英語",c:"--en",t:"単語のつづり",min:10,note:"日本語に合う英単語を書く。",qs:[
+   "会社","衣服（clothes とは別の語）","化学の","状態・状況","公正な","そのうえ","絶滅","危険",
+   "絶滅の危機にある","市民","世紀","人口","安全に","急速に","結果","続ける"]},
+  {id:"en2",sub:"英語",c:"--en",t:"時制の書きかえ・語の選択",min:10,note:"（　）の指示に従って全文を書く。選択問題は正しい語だけ書く。",qs:[
+   "I play tennis every day.（every day を yesterday にかえて）","It is sunny today.（today を tomorrow にかえて）",
+   "I live in Kagawa.（for ten years を加えて現在完了形に）","Ken is reading a book.（since two o'clock を加えて）",
+   "I visited Kyoto.（twice を加えて「2回訪れたことがある」の文に）","She has finished her homework.（yet を使って否定文に）",
+   "I have lived here (for / since) 2020.","She has (knew / known) him for many years.",
+   "Have you finished your homework (already / yet)?","I (visited / have visited) Kyoto last year."]},
+  {id:"en3",sub:"英語",c:"--en",t:"並べかえ・和訳",min:10,note:"並べかえは全文を書く。文頭は大文字に。",qs:[
+   "あなたはどのくらい長くトムを知っていますか。（you / have / how long / known）Tom?",
+   "私にとって料理をするのは難しい。（for / is / me / it / difficult / to）cook.",
+   "私は彼女に部屋をそうじしてほしい。I（her / want / to / clean）the room.",
+   "私にあなたのペンを使わせてください。（me / let / use / your pen）.",
+   "兄は私が箱を運ぶのを手伝ってくれた。My brother（me / helped / carry）the box.",
+   "私たちはまだ皿を洗っていません。We（not / have / yet / the dishes / washed）.",
+   "和訳：My mother wants me to clean my room.",
+   "和訳：I have been studying English for two hours."]},
+  {id:"en4",sub:"英語",c:"--en",t:"英作文",min:10,note:"日本語に合う英文を書く。",qs:[
+   "私はちょうど宿題を終えたところです。","あなたはどのくらい長く京都に住んでいますか。","私は3時間ずっとテレビを見ています。",
+   "私たちにとって自然を守ることは大切です。","母は私に皿を洗ってほしいと思っています。","父は私に彼の自転車を使わせてくれた。"]},
+  {id:"en5",sub:"英語",c:"--en",t:"読解",min:10,note:"次の英文を読んで答える。\n\nMika has lived in Takamatsu for ten years. She loves the sea near her house. Last summer, she found a lot of plastic bottles on the beach. She was surprised because many sea animals may eat plastic and die. Since then, she has been cleaning the beach with her friends every Sunday. She says, \"It is important for us to think about the sea. I want everyone to join us.\" Her teacher helped her make a poster about the problem.",qs:[
+   "Mika はどのくらい高松に住んでいるか。日本語で。","Mika が去年の夏に浜辺で見つけたものは何か。日本語で。",
+   "Mika が驚いたのはなぜか。日本語で。","英語で答えよ：What does Mika do every Sunday?",
+   "本文の内容に合うものを選べ。\nア Mika は先生にポスターを作ってもらった\nイ 先生は Mika がポスターを作るのを手伝った\nウ Mika は海が好きではない"]},
+  {id:"sc1",sub:"理科",c:"--sc",t:"イオン式・電離の式",min:12,note:"H⁺ や Cu²⁺ は下のボタンで入力できます（H+ や Cu2+ と打ってもOK）。",qs:[
+   "水素イオン","塩化物イオン","水酸化物イオン","ナトリウムイオン","銅イオン","亜鉛イオン","硫酸イオン",
+   "塩化水素 HCl の電離","水酸化ナトリウム NaOH の電離","塩化銅 CuCl₂ の電離","硫酸 H₂SO₄ の電離","水酸化カリウム KOH の電離"]},
+  {id:"sc2",sub:"理科",c:"--sc",t:"金属のイオンへのなりやすさ・電池",min:13,note:"式は電子を e⁻ で書く。",qs:[
+   "マグネシウム・亜鉛・銅を、イオンになりやすい順に書け。","硫酸銅水溶液に亜鉛板を入れると、亜鉛板の表面に何が付着するか。",
+   "ダニエル電池で −極になるのは亜鉛板・銅板のどちらか。","ダニエル電池の亜鉛板で起こる変化を、e⁻ を使った式で書け。","ダニエル電池の銅板で起こる変化を、e⁻ を使った式で書け。",
+   {q:"ダニエル電池のセロハン膜の役割を書け。",long:1},
+   "電池は、物質がもつ何エネルギーを電気エネルギーに変える装置か。","燃料電池で起こる化学変化を化学反応式で書け。"]},
+  {id:"sc3",sub:"理科",c:"--sc",t:"酸・アルカリ・中和",min:13,note:"",qs:[
+   "酸性の水溶液に共通して含まれるイオン（イオン式）","アルカリ性の水溶液に共通して含まれるイオン（イオン式）",
+   "BTB溶液は酸性・中性・アルカリ性でそれぞれ何色か。","中性の水溶液の pH の値",
+   "塩酸と水酸化ナトリウム水溶液の中和を化学反応式で書け。","中和で起こる反応をイオン式を使って書け。",
+   {q:"「塩」とはどのような物質か。「陰イオン」「陽イオン」を使って書け。",long:1},
+   "塩酸に水酸化ナトリウム水溶液を少しずつ加えて中性になるまでの間、数が変わらないイオンと、減っていくイオンをそれぞれ書け。"]},
+  {id:"sc4",sub:"理科",c:"--sc",t:"圧力・浮力・力の合成と分解",min:12,note:"100gの物体にはたらく重力を1Nとする。1cm² ＝ 0.0001m²。",qs:[
+   "質量600gの直方体（10cm×5cm×4cm）を、10cm×5cm の面を下にして置いた。机が受ける圧力は何Paか。",
+   "空気中で2.5Nを示す物体を、全体を水中に沈めると1.7Nを示した。浮力は何Nか。",
+   {q:"水中の物体に浮力が生じる理由を「水圧」という言葉を使って書け。",long:1},
+   "角度のある2力の合力は、2力を2辺とする何の何で表されるか。",
+   "斜面の傾きを大きくすると、台車にはたらく重力の斜面に平行な分力と垂直な分力はそれぞれどうなるか。"]},
+  {id:"so1",sub:"社会",c:"--so",t:"世界恐慌と戦争への道",min:15,note:"",qs:[
+   "1929年、世界恐慌のきっかけとなった株価の大暴落が起こった都市","アメリカのローズベルト大統領が世界恐慌に対して行った政策",
+   "イギリスやフランスが、植民地との貿易を増やし外国の商品に高い関税をかけた政策","ソ連が世界恐慌の影響をほとんど受けなかった理由を簡潔に書け。",
+   "イタリアやドイツで広まった、民主主義や自由主義を否定する独裁的な政治","1931年、関東軍が南満州鉄道の線路を爆破したことから始まった軍事行動",
+   {q:"満州事変の後、日本が国際連盟を脱退したのはなぜか。簡潔に書け。",long:1},
+   "1932年、海軍の青年将校らが犬養毅首相を暗殺した事件","1936年、陸軍の青年将校らが首相官邸などを占拠した事件",
+   "1937年、北京郊外で日中両国軍が衝突し、日中戦争のきっかけとなった事件","1938年、国民や物資を戦争に動員できるようにした法律",
+   "1940年、ほとんどの政党が解散して結成された組織","1939年、ドイツがソ連と結び、ポーランド侵攻の直前に締結した条約",
+   "1941年12月8日、日本がアメリカの海軍基地を攻撃した場所と、イギリス領への上陸地","戦争中、都市の小学生が空襲を避けて農村へ集団で移ったこと",
+   "1945年、日本が受け入れて降伏した宣言","原子爆弾が投下された都市と日付を2つ書け。"]},
+  {id:"so2",sub:"社会",c:"--so",t:"戦後の民主化と冷戦",min:15,note:"",qs:[
+   "戦後の日本の占領政策を行った連合国軍総司令部の略称と、最高司令官の名前",
+   "地主の土地を国が買い上げ、小作人に安く売り渡した改革","日本の経済を支配してきた大企業のグループを解体した改革",
+   "1945年の選挙法改正で選挙権が与えられたのは、満何歳以上のどんな人か。",
+   "日本国憲法が公布された年月日と、施行された年月日","日本国憲法の三つの基本原則","教育の機会均等や男女共学などを定めた法律",
+   "1945年、世界の平和を守るためにつくられた国際組織","アメリカを中心とする西側とソ連を中心とする東側の、直接戦火を交えない対立",
+   "1950年に始まった朝鮮戦争で、日本の経済が好景気になったことを何というか。",
+   "1951年、日本が48か国と結んで独立を回復した条約と、同時にアメリカと結んだ条約",
+   "1956年、日本がソ連と国交を回復した宣言と、その結果実現したこと","1955年から38年間続いた、自由民主党が政権をとり続けた体制",
+   "1972年に日本に返還された地域と、同じ年に国交を正常化した国"]},
+  {id:"so3",sub:"社会",c:"--so",t:"高度経済成長〜現代",min:10,note:"",qs:[
+   "1950年代半ばから1973年まで続いた急速な経済成長","池田勇人内閣がかかげた経済政策のスローガン",
+   "1964年の東京オリンピックに合わせて開通した鉄道","1973年、高度経済成長が終わるきっかけとなった出来事",
+   "公害問題に対応するため、1967年に制定された法律","核兵器を「持たず、つくらず、持ち込ませず」という方針",
+   "1989年、アメリカとソ連の首脳が冷戦の終結を宣言した会談","1980年代後半に起こった、株価や地価が異常に高くなった経済",
+   "1993年に発足した、ヨーロッパの国々の経済・政治的な結びつき","2001年9月11日にアメリカで起こった事件"]},
+  {id:"so4",sub:"社会",c:"--so",t:"公民：人権の歴史・現代社会の見方",min:10,note:"",qs:[
+   "1689年にイギリスで出された文書","1776年にアメリカで出された文書","1789年にフランスで出された文書",
+   "1919年にドイツで制定され、社会権を初めて取り入れた憲法",
+   "『統治二論』で抵抗権を唱えた人物","『法の精神』で三権分立を唱えた人物","『社会契約論』で人民主権を唱えた人物",
+   "人間が家族や学校、地域などの社会集団の中で生きる存在であることを何というか。",
+   "対立から合意をめざすときの判断基準のうち、「無駄を省く」考え方と「手続き・機会・結果が正しいか」という考え方をそれぞれ何というか。",
+   {q:"多数決で物事を決めるときに気をつけるべきことを書け。",long:1},
+   "夫婦のみ、または親と未婚の子どもだけで構成される家族","子どもの数が減り、65歳以上の人の割合が高くなっていくこと"]}
+  ]}
+,
+{ id:"d2", tab:"9/28(月)　国語・数学・英語 各2時間", planTitle:"この日の流れ（各教科2時間）",
+  plan:["国語 120分（漢字20・類義語対義語20・語の種類10・故郷25・物語と俳句25・記述20）","数学 120分（√のルール20・たし算ひき算20・展開20・有理化と式の値20・平方根の性質15・二次方程式25）","英語 120分（単語20・動詞の変化15・時制20・語順パターン25・和訳15・読解25）"],
+  secs:[
+  {id:"aj1",sub:"国語",c:"--jp",t:"漢字の書き取り（ノートに手書き）",min:20,hand:1,note:"ノートに番号をつけて手で書く。書き終わったら「答えを見る」で1問ずつ ○／×。昨日「自信なし」だった12問も入っています。",qs:[
+   "駅までのキョリを測る。","犬をクサリでつなぐ。","カンサンとした商店街。","お使いのダチンをもらう。","イクドも挑戦する。","地面にヒザをつく。","風にユレル草木。","友人をショウカイする。","知識をチクセキする。","自由にカイシャクする。",
+   "話をコチョウして伝える。","文章のボウトウを読む。","キョウボウな動物。","クマにオソわれる。","ガンジョウな箱。","各地でフンソウが起きる。","山の景色をナガめる。","玄関のカギをかける。","不安をゾウフクさせる。","技術がヒヤク的に進歩する。",
+   "不足をオギナう。","ショウジを張りかえる。","説明をショウリャクする。","俳句をカンショウする。","フクスウの意見を聞く。","大会のキロクを残す。","コンイロの服。","壁にペンキをヌる。","ビンボウな暮らし。","偶像をスウハイする。"]},
+  {id:"aj2",sub:"国語",c:"--jp",t:"類義語・対義語",min:20,note:"類義語は「＝」、対義語は「↔」。漢字二字で答える。わからなくても空欄にせず、思いつく言葉を書く。",qs:[
+   "希望 ＝ （　　）","欠点 ＝ （　　）","方法 ＝ （　　）","関心 ＝ （　　）","不服 ＝ （　　）","用意 ＝ （　　）","永遠 ＝ （　　）","手本 ＝ （　　）","案外 ＝ （　　）","同意 ＝ （　　）",
+   "服従 ↔ （　　）","具体 ↔ （　　）","原因 ↔ （　　）","慎重 ↔ （　　）","主観 ↔ （　　）","義務 ↔ （　　）","理想 ↔ （　　）","積極 ↔ （　　）","増加 ↔ （　　）","生産 ↔ （　　）",
+   "単純 ↔ （　　）","楽観 ↔ （　　）","肯定 ↔ （　　）","需要 ↔ （　　）","絶対 ↔ （　　）"]},
+  {id:"aj3",sub:"国語",c:"--jp",t:"重箱読み・湯桶読み／和語・漢語・外来語",min:10,note:"重箱読み＝音＋訓（ジュウ＋ばこ）、湯桶読み＝訓＋音（ゆ＋トウ）。音読みは中国から来た読み、訓読みは日本の読み。",qs:[
+   "台所（だい＋どころ）は重箱読み・湯桶読みのどちらか。","番組（ばん＋ぐみ）は？","役場（やく＋ば）は？","毎朝（まい＋あさ）は？","見本（み＋ほん）は？","身分（み＋ぶん）は？","夕刊（ゆう＋かん）は？","消印（けし＋いん）は？",
+   "「宿屋」「旅館」「ホテル」は、それぞれ和語・漢語・外来語のどれか。順に書け。","「速さ」は和語・漢語・外来語のどれか。","「速度」は？","「スピード」は？"]},
+  {id:"aj4",sub:"国語",c:"--jp",t:"読解「故郷」",min:25,note:"人物の名前と関係を正確に。選択肢は、本文と合わない部分がないかを1つずつ確かめる。",qs:[
+   "物語の舞台となる国","「私」が故郷に帰ったのは何年ぶりか。","「私」のおい（甥）の名前","ルントウの息子の名前","「豆腐屋小町」と呼ばれていた、近所の女性は誰か。",
+   "再会したルントウは「私」を何と呼んだか。",
+   "そう呼ばれたとき「私」が感じたこととして適切なものを選べ。\nア 二人の間に、悲しむべき厚い壁ができてしまったと感じた\nイ 昔と変わらず親しみを感じてうれしかった\nウ ルントウが冗談を言っていると思った",
+   "「私」がホンルとシュイションに願ったこととして適切なものを選べ。\nア 自分たちのようにへだたることなく、新しい生活をもつこと\nイ 自分と同じように故郷を離れて暮らすこと\nウ ルントウと同じような生活をすること",
+   "最後に「私」が考えた「希望」として適切なものを選べ。\nア 希望は、手に入れようとしなくても自然にかなう\nイ 希望は、もともとあるともないともいえないが、多くの人が求めて歩めば実現に近づく\nウ 希望は、自分だけが持っていればよい",
+   {q:"「故郷」の最後の「地上の道」のたとえは、どんなことを表しているか。「希望」「多くの人」という言葉を使って40字以内で書け。",long:1},
+   {q:"古い家の屋根に枯れ草がなびいている様子から、一家のどんな事情が読み取れるか。30字以内で書け。（昨日のやり直し）",long:1}]},
+  {id:"aj5",sub:"国語",c:"--jp",t:"「作られた『物語』を超えて」と俳句",min:25,note:"俳句：季語は「季節を表す言葉」。蛙（かわず）は春の季語。切れ字は「や」「かな」「けり」など。",qs:[
+   "探検家たちは、ゴリラのドラミングを何だと誤解したか。",
+   "ドラミングの本当の意味として適切なものを選べ。\nア 相手を攻撃する前の合図\nイ 相手とぶつからずに自己主張し、対等な関係を保とうとする行動\nウ 仲間に食べ物の場所を知らせる行動",
+   "ゴリラが暴力的な動物だという誤解が世界中に広まった原因を選べ。\nア ゴリラの研究者が報告書を書いたから\nイ ゴリラをモデルにした映画で、暴力的な怪物として描かれたから\nウ 動物園のゴリラが人を襲ったから",
+   {q:"筆者は、作られた「物語」を超えるために、どのような態度が必要だと述べているか。「相手の立場」「常識」という言葉を使って40〜50字で書け。（昨日のやり直し）",long:1},
+   "「古池や蛙飛びこむ水の音」の季語と季節","同じ句の切れ字","「名月や池をめぐりて夜もすがら」の季語と季節","「菜の花や月は東に日は西に」の季語と季節","「柿食へば鐘が鳴るなり法隆寺」の季語と季節",
+   "「やせ蛙負けるな一茶これにあり」の季語と季節","「柿食へば鐘が鳴るなり法隆寺」は何句切れか。","「名月や池をめぐりて夜もすがら」は何句切れか。",
+   "五・七・五の十七音で作る決まりを何というか。","季語を季節ごとに分類して集めた本を何というか。",
+   {q:"自由律俳句とはどのような俳句か。簡潔に書け。",long:1}]},
+  {id:"aj6",sub:"国語",c:"--jp",t:"記述トレーニング",min:20,note:"書き方の型：①問いに合わせた文末（〜から／〜こと／〜様子）②指定語を必ず入れる③字数の8割以上を書く。空欄は0点、書けば部分点。",qs:[
+   {q:"「故郷」で「私」がルントウとの間に感じた「壁」とは何か。「身分」という言葉を使って30字以内で書け。",long:1},
+   {q:"人間が作った「物語」が悲劇をもたらすのはなぜか。「誤解」「敵対」という言葉を使って40字以内で書け。",long:1},
+   {q:"「菜の花や月は東に日は西に」は、どんな情景をよんだ句か。30字以内で書け。",long:1},
+   {q:"あなたが「新しい世界」と出会うときに大切にしたいことを、理由をふくめて60字程度で書け。",long:1}]},
+  {id:"am1",sub:"数学",c:"--ma",t:"√のルール（ここが一番大事）",min:20,note:"ルール：√a×√a＝a（√7×√7＝7。√14ではない）／√a×√b＝√ab／√(□²×b)＝□√b（√12＝√(4×3)＝2√3）",qs:[
+   "√3 × √3","(√5)²","√7 × √7","√2 × √8","√3 × √5","√6 × √3（答えは簡単な形に）","√18 ÷ √2","√12 を a√b の形に","√27 を a√b の形に","√45 を a√b の形に","√50 を a√b の形に","√72 を a√b の形に",
+   "2√3 を √a の形に","3√2 を √a の形に","5√3 × 2√3"]},
+  {id:"am2",sub:"数学",c:"--ma",t:"√のたし算・ひき算",min:20,note:"√の中が同じものだけまとめられる（2√3＋5√3＝7√3）。√の中が違うときは、まず簡単な形に直す。√2＋√3 はこれ以上まとまらない。",qs:[
+   "2√3 ＋ 5√3","4√2 − √2","√8 ＋ √18","√12 ＋ √27","√50 − √8","√24 ＋ √54","√3 ＋ √12 − √27","√48 − √3","√20 ＋ √45","5/√5 ＋ √20"]},
+  {id:"am3",sub:"数学",c:"--ma",t:"√をふくむ式の展開",min:20,note:"乗法公式：(a+b)²＝a²+2ab+b²／(a+b)(a−b)＝a²−b²／(x+a)(x+b)＝x²+(a+b)x+ab。(√7)²＝7 を忘れずに。",qs:[
+   "(√3 ＋ 1)²","(√5 − 2)²","(√7 ＋ 3)(√7 − 3)","(√6 ＋ 1)(√6 − 1)","(√7 ＋ √2)(√7 − √2)","(√2 ＋ 3)(√2 ＋ 1)","√2(√6 ＋ √2)","(√5 ＋ 2)²","(√3 − √2)²","(2√3 ＋ 1)(√3 − 2)"]},
+  {id:"am4",sub:"数学",c:"--ma",t:"有理化と式の値",min:20,note:"有理化：分母の√と同じ√を分母・分子にかける（6/√2＝6√2/2＝3√2）。式の値は、先に因数分解してから代入すると楽。",qs:[
+   "6/√2","10/√5","3/√3","√2/√3","4/√8","12/√6","√5/(2√3)",
+   "x＝√3＋1、y＝√3−1 のとき x＋y","同じとき xy","同じとき x²−y²","同じとき x²＋2xy＋y²","x＝√5−2 のとき x＋2","同じとき x²＋4x＋4"]},
+  {id:"am5",sub:"数学",c:"--ma",t:"平方根の性質",min:15,note:"√(□n) が自然数 → □n が「ある数の2乗」になるように。3＜√a＜4 → 2乗して 9＜a＜16。",qs:[
+   "√(20n) が自然数となる最も小さい自然数 n","√(12n) が自然数となる最も小さい自然数 n","√(45n) が自然数となる最も小さい自然数 n",
+   "3＜√a＜4 を満たす整数 a は何個か","2＜√a＜3 を満たす整数 a をすべて書け","√(18−n) が整数となる自然数 n をすべて書け","√(10−n) が整数となる自然数 n をすべて書け",
+   "√7 の整数部分と小数部分","√13 の整数部分と小数部分"]},
+  {id:"am6",sub:"数学",c:"--ma",t:"二次方程式",min:25,note:"手順：①右辺を0にして整理 ②因数分解できるか ③できなければ解の公式 x＝(−b±√(b²−4ac))/2a ④約分・√の簡単化まで。",qs:[
+   "x² − 5x ＋ 6 ＝ 0","x² ＋ 2x − 15 ＝ 0","x² − 9 ＝ 0","x² ＝ 5x","(x − 3)² ＝ 5","x² ＋ 3x ＋ 1 ＝ 0","2x² ＋ 4x − 1 ＝ 0","x² ＋ 6x − 1 ＝ 0","3x² − 5x ＋ 1 ＝ 0",
+   "(x ＋ 2)² ＝ 3(x ＋ 2)","x(x − 3) ＝ 10",
+   "x² ＋ ax − 12 ＝ 0 の解の1つが 3 のとき、a の値ともう1つの解","x² ＋ ax ＋ 6 ＝ 0 の解の1つが 2 のとき、a の値ともう1つの解",
+   "連続する2つの自然数の積が156のとき、2つの数","縦が横より3cm長い長方形の面積が40cm²のとき、横の長さ（x(x＋3)＝40 を解く）"]},
+  {id:"ae1",sub:"英語",c:"--en",t:"単語のつづり",min:20,note:"書いたら声に出して読み、つづりを確かめる。",qs:[
+   "会社","衣服","状態・状況","公正な","そのうえ","絶滅の危機にある","人口","安全に","急速に","結果","インタビュー（する）","リサイクルする",
+   "間違い","（強い）影響・衝撃","絶滅","難題・挑戦","市民","（その土地に）固有の","調査・研究","生態系","世紀","（動物などを）放す","最近では","続ける"]},
+  {id:"ae2",sub:"英語",c:"--en",t:"動詞の変化（過去形・過去分詞）",min:15,note:"「過去形, 過去分詞」の順にカンマで区切って書く。現在完了は have ＋ 過去分詞。",qs:[
+   "play","study","know","see","make","write","eat","take","hear","be","do","become","begin","visit","live"]},
+  {id:"ae3",sub:"英語",c:"--en",t:"時制の判断",min:20,note:"yesterday / last ～ / ～ ago → 過去形。for ～（期間）・since ～（起点）→ 現在完了。tomorrow → will。選択問題は正しい語だけ書く。",qs:[
+   "I (played / have played) soccer yesterday.","I (lived / have lived) here since 2015.","It (is / will be) rainy tomorrow.","She (is reading / has been reading) a book for two hours.",
+   "I have lived here (for / since) five years.","I have lived here (for / since) 2020.","Have you ever (see / saw / seen) a koala?","I have (already / yet) finished lunch.","I haven't finished it (already / yet).",
+   "He is watching TV.（since this morning を加えて全文）","I live in Tokyo.（for three years を加えて現在完了の全文）","They are busy now.（now を tomorrow にかえて全文）",
+   "I visited Kyoto.（twice を使い「2回訪れたことがある」の全文）","Did you finish your homework?（yet を使った現在完了の疑問文に）"]},
+  {id:"ae4",sub:"英語",c:"--en",t:"語順パターン（It is ～ for 人 to／want 人 to／let・help 人 原形）",min:25,note:"型：It is 形容詞 for 人 to 動詞の原形 ～.／want 人 to 動詞の原形／let 人 動詞の原形／help 人 動詞の原形。to のあとは必ず原形（washed ではなく wash）。並べかえは全文を書く。",qs:[
+   "（is / it / for / to / easy / me）swim.","（important / is / it / us / for / to）study English.","I（you / want / to / come）to the party.","My father（me / wants / be / to）a doctor.",
+   "（me / let / try）it.","She（me / helped / clean）the room.",
+   "私にとって英語を話すことは難しい。","彼らにとってサッカーをすることは楽しい。","私は彼に手伝ってほしい。","母は私に早く寝てほしいと思っている。","私にあなたの写真を見せてください。（let を使って）","兄は私が宿題をするのを手伝ってくれた。"]},
+  {id:"ae5",sub:"英語",c:"--en",t:"和訳",min:15,note:"have been ～ing は「ずっと～している」、want 人 to ～ は「人に～してほしい」。",qs:[
+   {q:"I have just finished my homework.",long:1},{q:"I have been studying English for two hours.",long:1},{q:"My mother wants me to clean my room.",long:1},
+   {q:"It is important for us to protect nature.",long:1},{q:"Please let me know about it.",long:1},{q:"Have you ever been to Okinawa?",long:1}]},
+  {id:"ae6",sub:"英語",c:"--en",t:"読解",min:25,note:"次の英文を読んで答える。\n\nKen is a junior high school student. He has been interested in animals since he was a child. Last month, he visited a zoo with his family. There, he learned that some animals are endangered. For example, the number of red pandas has been decreasing because people have cut down many forests. Ken was very surprised. After that, he started to read books about animals. He says, \"It is important for us to know about this problem. I want my friends to think about it too.\" Now he is making a report for his class. His sister helped him find some pictures on the internet. He has already finished half of the report.",qs:[
+   "ケンはいつから動物に興味があるか。日本語で。","先月、ケンはだれとどこへ行ったか。日本語で。","レッサーパンダの数が減っている理由を日本語で。","英語で答えよ：What is Ken making now?",
+   "本文の内容に合うものを選べ。\nア ケンはもうレポートを書き終えた\nイ ケンの姉は、ケンが写真を探すのを手伝った\nウ ケンは友達にこの問題を考えてほしくない",
+   {q:"I want my friends to think about it too. を日本語に。",long:1}]}
+  ]},
+{ id:"d4", tab:"9/29(火)朝　国数英 最終チェック30分", planTitle:"テスト前の最終チェック（30分）",
+  plan:["国語 10分（類義語・対義語、句切れ）","数学 12分（√と±の区別、二次方程式、式の値）","英語 8分（語順パターンの英作文、will、begin）"],
+  secs:[
+  {id:"cj1",sub:"国語",c:"--jp",t:"類義語・対義語／俳句",min:10,note:"昨日まちがえた・空欄だった問題だけです。句切れ：「や」「かな」などの切れ字や、意味が切れるところで数える（名月や＝最初の五音で切れる＝初句切れ）。",qs:[
+   "永遠 ＝ （　　）","手本 ＝ （　　）","案外 ＝ （　　）","同意 ＝ （　　）","服従 ↔ （　　）","具体 ↔ （　　）","義務 ↔ （　　）","生産 ↔ （　　）","楽観 ↔ （　　）","需要 ↔ （　　）","絶対 ↔ （　　）",
+   "「名月や池をめぐりて夜もすがら」は何句切れか。","「柿食へば鐘が鳴るなり法隆寺」は何句切れか。","季語を季節ごとに分類して集めた本","「役場（やく＋ば）」は重箱読み・湯桶読みのどちらか。"]},
+  {id:"cm1",sub:"数学",c:"--ma",t:"√と±の区別・二次方程式・式の値",min:12,note:"注意：√a はプラスの数だけ（√9＝3、√3×√3＝3）。± がつくのは「平方根」を答えるときと、x²＝a を解くときだけ（9の平方根は±3、x²＝9 なら x＝±3）。",qs:[
+   "√3 × √3","√9","9の平方根","x² ＝ 9 を解け","√2 × √8",
+   "x² − 5x ＋ 6 ＝ 0","x² ＋ 3x ＋ 1 ＝ 0","2x² ＋ 4x − 1 ＝ 0","(x ＋ 2)² ＝ 3(x ＋ 2)",
+   "√7 の小数部分（整数部分をひく）","x ＝ √5 − 2 のとき x² ＋ 4x ＋ 4（＝(x＋2)² を使う）"]},
+  {id:"ce1",sub:"英語",c:"--en",t:"語順パターンの英作文",min:8,note:"型を先に書いてから単語を入れる：It is 形容詞 for 人 to 原形／want 人 to 原形／let 人 原形／help 人 原形。to のあとは原形（came ではなく come）。tomorrow には will。",qs:[
+   "私にとって英語を話すことは難しい。","彼らにとってサッカーをすることは楽しい。","私は彼に手伝ってほしい。","母は私に早く寝てほしいと思っている。","私にあなたの写真を見せてください。（let を使って）","兄は私が宿題をするのを手伝ってくれた。",
+   "明日は雨でしょう。（It で始めて rainy を使う）","begin の過去形と過去分詞","I want you to (come / came / coming) to the party."]}
+  ]},
+{ id:"d3", tab:"9/29(火)　社会・理科 各2時間", planTitle:"この日の流れ（各教科2時間）",
+  plan:["社会 120分（年代20・戦前20・戦後20・高度成長〜現代20・公民20・記述20）","理科 120分（イオンの電荷20・電離の式20・電子の式と電池20・酸アルカリ中和25・圧力浮力力25・まとめ記述10）"],
+  secs:[
+  {id:"bs1",sub:"社会",c:"--so",t:"年代と並べかえ",min:20,note:"年は数字で（例：1929）。並べかえは記号を古い順に書く（例：イアウエ）。",qs:[
+   "世界恐慌が始まった年","満州事変が起こった年","日中戦争が始まった年","太平洋戦争が始まった年","日本国憲法が公布された年月日","日本国憲法が施行された年月日","サンフランシスコ平和条約が結ばれた年","マルタ会談が行われた年",
+   "古い順に：ア 日中戦争　イ 世界恐慌　ウ 太平洋戦争　エ 満州事変","古い順に：ア 国際連合加盟　イ 日本国憲法の施行　ウ サンフランシスコ平和条約　エ 沖縄返還",
+   "古い順に：ア 石油危機　イ 東京オリンピック　ウ ベルリンの壁崩壊　エ 同時多発テロ","古い順に：ア 大政翼賛会の結成　イ 二・二六事件　ウ 国家総動員法　エ 五・一五事件"]},
+  {id:"bs2",sub:"社会",c:"--so",t:"世界恐慌〜終戦",min:20,note:"",qs:[
+   "五・一五事件で終わった、政党の党首が内閣を組織する政治","満州事変を調査するため国際連盟が派遣した調査団","日本が国際連盟を脱退した年","満州国の元首となった清の最後の皇帝",
+   "1940年に日本・ドイツ・イタリアが結んだ同盟","1941年に日本がソ連と結んだ条約","アメリカ・イギリス・中国・オランダによる日本への経済封鎖の呼び名",
+   "戦時中、米や砂糖などを決められた量だけ配った制度","大学生などが軍隊に召集されたこと","1945年3月にアメリカ軍が上陸し、住民をまきこむ地上戦となった場所",
+   "1945年2月、米・英・ソの首脳がソ連の対日参戦などを決めた会談","昭和天皇がラジオで国民に降伏を伝えた日（月日）"]},
+  {id:"bs3",sub:"社会",c:"--so",t:"戦後改革〜冷戦下の日本",min:20,note:"",qs:[
+   "戦争の指導者を裁いた裁判","天皇が神の子孫であることを否定した宣言","戦後に廃止された、社会運動を取りしまった法律","労働者の団結権などを認めた法律",
+   "朝鮮戦争のときに GHQ の指示でつくられ、のちに自衛隊となった組織","1954年、アメリカの水爆実験で被ばくした漁船","1960年、日米安全保障条約の改定に反対して起こった運動",
+   "1965年に日本が韓国と結んだ条約","沖縄返還を実現した首相","1978年に日本が中国と結んだ条約","1962年、ソ連のミサイル基地をめぐって米ソが対立した事件","アメリカが北ベトナムを爆撃するなどして本格化した戦争"]},
+  {id:"bs4",sub:"社会",c:"--so",t:"高度経済成長〜現代",min:20,note:"",qs:[
+   "1950年代後半に普及した、白黒テレビ・電気洗濯機・電気冷蔵庫の呼び名","水俣病・新潟水俣病・イタイイタイ病・四日市ぜんそくをまとめて何というか","1971年に設置された、公害に取り組む国の役所",
+   "1973年の石油危機のきっかけとなった戦争","1980年代、日本の輸出が増えてアメリカなどとの間で起こった問題","1989年に崩壊した、東西ベルリンを分けていた壁","東西ドイツが統一した年","ソ連が解体した年",
+   "1991年、イラクのクウェート侵攻をきっかけに起こった戦争","1992年に成立し、自衛隊の海外派遣を可能にした法律","1995年に起こった大地震","2011年に起こった大地震","冷戦の終結が宣言された会談（漢字とカタカナで）"]},
+  {id:"bs5",sub:"社会",c:"--so",t:"公民：現代社会と人権",min:20,note:"",qs:[
+   "人や物、お金、情報が国境をこえて移動し、世界の一体化が進むこと","情報が社会の中で大きな役割を果たすようになること","情報を正しく読み取り、活用する力",
+   "決定の仕方で、全員の意見が反映されるが時間がかかる方法","時間はかからないが、少数意見が反映されにくい方法","対立から合意をめざすときの2つの考え方",
+   "ロックの著書","モンテスキューが唱えた、権力を分ける考え","ルソーの著書","人間らしい生活を保障する権利","社会権を初めて定めた憲法",
+   "1776年にアメリカで出された宣言","1789年にフランスで出された宣言","1689年にイギリスで出された文書"]},
+  {id:"bs6",sub:"社会",c:"--so",t:"記述・資料",min:20,note:"「〜から」「〜こと」など問いに合った文末で、キーワードを必ず入れる。",qs:[
+   {q:"世界恐慌への対策で、アメリカとイギリスのちがいを「公共事業」「植民地」という言葉を使って書け。",long:1},
+   {q:"ソ連が世界恐慌の影響を受けなかった理由を「五か年計画」という言葉を使って書け。",long:1},
+   {q:"五・一五事件や二・二六事件の後、日本の政治はどのように変わったか。「軍部」という言葉を使って書け。",long:1},
+   {q:"農地改革によって農村はどのように変わったか。「自作農」という言葉を使って書け。",long:1},
+   {q:"高度経済成長の一方で起こった問題を1つあげて、簡単に説明せよ。",long:1},
+   {q:"多数決で決めるときに気をつけることを、理由をふくめて書け。",long:1}]},
+  {id:"bc1",sub:"理科",c:"--sc",t:"イオンの電荷（＋いくつ・−いくつ）",min:20,note:"ヒント：＋2になるのは Mg・Ca・Cu・Zn・Ba。それ以外の陽イオンは＋1。Cl⁻・OH⁻ は−1、SO₄²⁻・CO₃²⁻ は−2。＋1は「⁺」、−1は「⁻」、＋2は「²⁺」のボタン（H+ や Cu2+ と打ってもOK）。",qs:[
+   "水素イオン","ナトリウムイオン","カリウムイオン","銀イオン","アンモニウムイオン","マグネシウムイオン","銅イオン","亜鉛イオン","カルシウムイオン","バリウムイオン",
+   "塩化物イオン","水酸化物イオン","硫酸イオン","炭酸イオン",
+   "原子が電子を失ってできるイオンを何というか","原子が電子を受け取ってできるイオンを何というか","ナトリウム原子が電子を1個失ってできるイオン（イオン式）","塩素原子が電子を1個受け取ってできるイオン（イオン式）","銅原子が電子を2個失ってできるイオン（イオン式）"]},
+  {id:"bc2",sub:"理科",c:"--sc",t:"電離の式",min:20,note:"左の物質が＋と−のイオンに分かれる。右側の＋と−の数がつり合うように係数をつける（CuCl₂ → Cu²⁺ ＋ 2Cl⁻）。",qs:[
+   "HCl","NaOH","KOH","NaCl","CuCl₂","H₂SO₄","HNO₃（硝酸イオンは NO₃⁻）","Ba(OH)₂","CuSO₄","ZnSO₄"]},
+  {id:"bc3",sub:"理科",c:"--sc",t:"電子の式と電池",min:20,note:"イオンになる：Zn → Zn²⁺ ＋ 2e⁻（電子を出す）。原子にもどる：Cu²⁺ ＋ 2e⁻ → Cu（電子を受け取る）。",qs:[
+   "亜鉛原子が亜鉛イオンになる変化を e⁻ を使って","銅イオンが銅原子になる変化を e⁻ を使って","マグネシウム原子がマグネシウムイオンになる変化を e⁻ を使って",
+   "マグネシウム・亜鉛・銅をイオンになりやすい順に","硫酸銅水溶液に亜鉛板を入れたとき、亜鉛板に付着する物質","ダニエル電池の−極は何板か","ダニエル電池で、電子が導線を流れる向き（〇〇板から〇〇板へ）",
+   "ダニエル電池で、電流が流れる向き（〇〇板から〇〇板へ）","時間がたつと、硫酸亜鉛水溶液の濃さはどうなるか","時間がたつと、硫酸銅水溶液の濃さはどうなるか",
+   {q:"セロハン膜の役割を2つ書け。",long:1},"充電できない電池と、充電できる電池の名前","水の電気分解の化学反応式","燃料電池で起こる化学変化の化学反応式",{q:"燃料電池が環境にやさしいといわれる理由",long:1}]},
+  {id:"bc4",sub:"理科",c:"--sc",t:"酸・アルカリ・中和",min:25,note:"",qs:[
+   "酸性の水溶液に共通するイオン（イオン式）","アルカリ性の水溶液に共通するイオン（イオン式）","BTB溶液の色（酸性・中性・アルカリ性の順に）","フェノールフタレイン溶液がアルカリ性で示す色","酸性の水溶液で青色リトマス紙は何色になるか",
+   "中性の pH","アルカリ性が強いほど pH はどうなるか","うすい塩酸にマグネシウムを入れると発生する気体の化学式",
+   "塩酸と水酸化ナトリウム水溶液の中和の化学反応式","中和をイオンで表した式","硫酸と水酸化バリウム水溶液の中和の化学反応式","上の反応でできる白い沈殿（塩）の名前",
+   "塩酸に水酸化ナトリウム水溶液を加えていくとき、中性になるまで数が変わらないイオン","同じとき、中性になるまで減っていくイオン","同じとき、ずっと増えていくイオン",
+   "中性になった水溶液から水を蒸発させると出てくる結晶の物質名"]},
+  {id:"bc5",sub:"理科",c:"--sc",t:"圧力・浮力・力",min:25,note:"100g → 1N。1cm²＝0.0001m²（10cm×5cm＝50cm²＝0.005m²）。圧力[Pa]＝力[N]÷面積[m²]。小数点は「.」（0,8 ではなく 0.8）。",qs:[
+   "質量600gの物体にはたらく重力は何Nか","50cm² は何m²か","6Nの力が0.005m²にはたらくときの圧力は何Paか","同じ6Nが0.002m²にはたらくときの圧力は何Paか","質量2kgの物体を底面積0.04m²の面で置いたときの圧力は何Paか",
+   "空気中で2.5N、水中で1.7Nを示した物体の浮力は何Nか","空気中で4.0N、水中で3.0Nを示した物体の浮力は何Nか",
+   "浮力の大きさは、水中にある部分の体積が大きいほどどうなるか","物体全体が水中にあるとき、浮力の大きさは深さによって変わるか",{q:"浮力が生じる理由を「水圧」という言葉を使って書け。",long:1},
+   "一直線上で同じ向きの3Nと5Nの合力","一直線上で反対向きの3Nと5Nの合力（大きさと向き）","角度のある2力の合力は何の何で表されるか",
+   "斜面の傾きを大きくすると、重力の斜面に平行な分力と垂直な分力はそれぞれどうなるか（平行→？、垂直→？の順）","物体が静止しているとき、はたらく力の合力は何Nか"]},
+  {id:"bc6",sub:"理科",c:"--sc",t:"まとめの記述",min:10,note:"",qs:[
+   {q:"「塩」とは何か。「陰イオン」「陽イオン」を使って書け。",long:1},{q:"中和とはどのような反応か。「水素イオン」「水酸化物イオン」「水」を使って書け。",long:1},{q:"電池とはどのような装置か。「化学エネルギー」「電気エネルギー」を使って書け。",long:1}]}
+  ]}
+
+];
+
+
+// ===== 正答データ =====
+// 文字列/配列: 語句（ふくめばOK）  m: 数式（完全一致）  c: 化学式  e: 英文  s: すべての要素をふくむ  o: 順番どおり  w: 自己採点（模範解答）
+const KEYS={
+cj1:["永久","模範","意外","賛成","反抗","抽象","権利","消費","悲観","供給","相対",["初句切れ","一句切れ","1句切れ"],["二句切れ","2句切れ"],"歳時記","重箱"],
+cm1:[{m:["3"]},{m:["3"]},{m:["±3"]},{m:["±3","3,-3","-3,3"]},{m:["4"]},{s:["2","3"]},{m:["(-3±√5)/2","-3±√5/2"]},{m:["(-2±√6)/2","-2±√6/2"]},{s:["-2","1"]},{m:["√7-2"]},{m:["5"]}],
+ce1:[{e:["It is difficult for me to speak English.","It's difficult for me to speak English.","It is hard for me to speak English."]},{e:["It is fun for them to play soccer.","It's fun for them to play soccer."]},{e:["I want him to help me."]},
+ {e:["My mother wants me to go to bed early.","My mother wants me to sleep early."]},{e:["Let me see your pictures.","Let me see your picture.","Let me see your photos.","Let me see your photo.","Please let me see your pictures.","Please let me see your photos."]},
+ {e:["My brother helped me do my homework.","My brother helped me with my homework.","My big brother helped me do my homework.","My older brother helped me do my homework."]},{e:["It will be rainy tomorrow.","It'll be rainy tomorrow."]},{e:["began, begun"]},{e:["come","I want you to come to the party."]}],
+jp1:["勇壮","潜る","距離","欧米","鎖","閑散","畜産","艶","塀","駄賃","幾度","膝","揺れる","鮮やか","紹介","蓄積","解釈","悲惨","誇張","冒頭"],
+jp2:["不満","願望",["短所","弱点"],["手段","手法"],"興味","反抗","客観","抽象","結果",["軽率","大胆"],"和語","漢語","外来語","重箱","湯桶","重箱"],
+jp3:["魯迅","冬",{w:"家を明け渡して故郷に別れを告げ、一家で引っ越すため。"},["ルントウ","閏土"],{s:[["ホンル","宏児"],["シュイション","水生"]]},"イ",
+ {w:"一家が落ちぶれて、家を手入れする余裕もなくなっていた。（25字程度）"},
+ {w:"相手の立場に立って行動の意味を考え、自分たちの常識を疑って、伝え聞いた話と実際の現象を照らし合わせる態度。"},
+ {s:["蛙","春"]},"や",{w:"五・七・五の定型や季語にとらわれず、自由な音律で表現する俳句。"}],
+jp4:["きょうぼう","おそわれる","がんじょう","ながめる","めぐらす",["ゆきかう","いきかう"],"こんいろ","できあい","すうはい","ぐうぞう","ア","ア","イ","イ"],
+ma1:[{m:["5√3"]},{m:["4√2"]},{m:["2√5"]},{m:["4√6"]},{m:["2√3"]},{m:["9+4√5","4√5+9"]},{m:["5-2√6","-2√6+5"]},{m:["-2"]},{m:["4-3√3","-3√3+4"]},{m:["-4-3√6","-3√6-4"]}],
+ma2:[{m:["3√2"]},{m:["√15/6"]},{m:["√3/2"]},{m:["2√5"]},{m:["6"]},{m:["5"]},{s:["2","9","14","17","18"]},{s:["2","√7-2"]},{m:["4√3"]},{m:["5"]}],
+ma3:[{s:["5","-2"]},{s:["-2","1"]},{m:["(-2±√6)/2","-2±√6/2"]},{m:["(5±√13)/6","5±√13/6"]},{m:["-3±√10"]},{s:["1","-4"]},{s:["12","13"]},{m:["5"]}],
+en1:[{e:["company"]},{e:["clothing"]},{e:["chemical"]},{e:["condition"]},{e:["fair"]},{e:["moreover"]},{e:["extinction"]},{e:["danger"]},{e:["endangered"]},{e:["citizen"]},{e:["century"]},{e:["population"]},{e:["safely"]},{e:["rapidly"]},{e:["result"]},{e:["continue"]}],
+en2:[{e:["I played tennis yesterday."]},{e:["It will be sunny tomorrow."]},{e:["I have lived in Kagawa for ten years.","I've lived in Kagawa for ten years.","I have lived in Kagawa for 10 years."]},
+ {e:["Ken has been reading a book since two o'clock.","Ken has been reading a book since 2 o'clock."]},{e:["I have visited Kyoto twice.","I've visited Kyoto twice."]},
+ {e:["She has not finished her homework yet.","She hasn't finished her homework yet."]},{e:["since","I have lived here since 2020."]},{e:["known","She has known him for many years."]},{e:["yet","Have you finished your homework yet?"]},{e:["visited","I visited Kyoto last year."]}],
+en3:[{e:["How long have you known Tom?"]},{e:["It is difficult for me to cook."]},{e:["I want her to clean the room."]},{e:["Let me use your pen."]},{e:["My brother helped me carry the box."]},{e:["We have not washed the dishes yet."]},
+ {w:"母は私に（私の）部屋をそうじしてほしいと思っている。"},{w:"私は2時間ずっと英語を勉強している。"}],
+en4:[{e:["I have just finished my homework.","I've just finished my homework.","I just finished my homework."]},{e:["How long have you lived in Kyoto?","How long have you been living in Kyoto?"]},
+ {e:["I have been watching TV for three hours.","I've been watching TV for three hours.","I have been watching TV for 3 hours."]},
+ {e:["It is important for us to protect nature.","It's important for us to protect nature.","It is important for us to save nature."]},{e:["My mother wants me to wash the dishes."]},
+ {e:["My father let me use his bike.","My father let me use his bicycle."]}],
+en5:[["10年","十年"],["ペットボトル","プラスチック"],{w:"多くの海の動物がプラスチックを食べて死ぬかもしれないから。"},{w:"She cleans the beach with her friends. / She has been cleaning the beach with her friends."},"イ"],
+sc1:[{c:["H+"]},{c:["Cl-"]},{c:["OH-"]},{c:["Na+"]},{c:["Cu2+"]},{c:["Zn2+"]},{c:["SO42-"]},{c:["HCl→H++Cl-"]},{c:["NaOH→Na++OH-"]},{c:["CuCl2→Cu2++2Cl-"]},{c:["H2SO4→2H++SO42-"]},{c:["KOH→K++OH-"]}],
+sc2:[{o:["マグネシウム亜鉛銅","mgzncu"]},"銅","亜鉛",{c:["Zn→Zn2++2e-"]},{c:["Cu2++2e-→Cu"]},{w:"2つの水溶液がすぐに混ざらないようにしながら、イオンを通過させる（電気的なかたよりをなくす）。"},"化学",{c:["2H2+O2→2H2O"]}],
+sc3:[{c:["H+"]},{c:["OH-"]},{s:["黄","緑","青"]},{m:["7"]},{c:["HCl+NaOH→NaCl+H2O"]},{c:["H++OH-→H2O"]},{w:"酸の陰イオンとアルカリの陽イオンが結びついてできた物質。"},{s:[["塩化物イオン","cl-"],["水素イオン","h+"]]}],
+sc4:[{m:["1200"]},{m:["0.8"]},{w:"水圧は深いほど大きいので、物体の下面にはたらく上向きの水圧が、上面にはたらく下向きの水圧より大きいから。"},{s:["平行四辺形","対角線"]},{s:["大き","小さ"]}],
+so1:["ニューヨーク","ニューディール","ブロック経済",{w:"五か年計画による計画経済を行っていたから。"},"ファシズム","満州事変",
+ {w:"国際連盟が満州国を認めず、日本軍の占領地からの引きあげを勧告したから。"},["五一五事件","515事件"],["二二六事件","226事件"],["盧溝橋","ろこうきょう"],"国家総動員法","大政翼賛会","独ソ不可侵条約",
+ {s:["真珠湾",["マレー","マレー半島"]]},"疎開","ポツダム宣言",{s:["広島","長崎",["8月6日","8/6"],["8月9日","8/9"]]}],
+so2:[{s:[["ghq","連合国軍総司令部"],"マッカーサー"]},"農地改革","財閥解体",{s:["20",["男女","男子と女子","男性と女性"]]},{s:[["1946年11月3日","1946/11/3"],["1947年5月3日","1947/5/3"]]},
+ {s:["国民主権",["基本的人権","人権の尊重"],"平和主義"]},"教育基本法",["国際連合","国連"],["冷戦","冷たい戦争"],["特需"],{s:["サンフランシスコ",["日米安全保障条約","日米安保"]]},
+ {s:["日ソ共同宣言",["国際連合","国連"]]},["55年体制","五五年体制"],{s:["沖縄",["中国","中華人民共和国"]]}],
+so3:["高度経済成長","所得倍増","新幹線",["石油危機","オイルショック"],"公害対策基本法","非核三原則","マルタ会談","バブル",["eu","ヨーロッパ連合","欧州連合"],"同時多発テロ"],
+so4:[["権利章典","権利の章典"],"独立宣言","人権宣言","ワイマール憲法","ロック","モンテスキュー","ルソー","社会的存在",{s:["効率","公正"]},{w:"少数意見を尊重すること。"},"核家族","少子高齢化"]
+,
+aj1:["距離","鎖","閑散","駄賃","幾度","膝","揺れる","紹介","蓄積","解釈","誇張","冒頭","凶暴","襲われる","頑丈","紛争","眺める","鍵","増幅","飛躍","補う","障子","省略","鑑賞","複数","記録","紺色","塗る","貧乏","崇拝"],
+aj2:["願望",["短所","弱点"],["手段","手法"],"興味","不満","準備","永久","模範","意外","賛成","反抗","抽象","結果",["軽率","大胆"],"客観","権利","現実","消極","減少","消費","複雑","悲観","否定","供給","相対"],
+aj3:["重箱","重箱","重箱","重箱","湯桶","湯桶","湯桶","湯桶",{o:["和語漢語外来語"]},"和語","漢語","外来語"],
+aj4:["中国",["二十","20"],["ホンル","宏児"],["シュイション","水生"],["ヤンおばさん","ヤン"],["旦那さま","旦那様","だんなさま"],"ア","ア","イ",
+ {w:"希望は、もともとあるものでもないものでもなく、多くの人が求めて行動すれば実現していくということ。"},{w:"一家が落ちぶれて、家を手入れする余裕もなくなっていた。"}],
+aj5:[["戦い","宣戦"],"イ","イ",{w:"相手の立場に立って行動の意味を考え、自分たちの常識を疑って、伝え聞いた話と実際を照らし合わせる態度。"},
+ {s:["蛙","春"]},"や",{s:["名月","秋"]},{s:["菜の花","春"]},{s:["柿","秋"]},{s:["蛙","春"]},["二句切れ","2句切れ"],["初句切れ","一句切れ","1句切れ"],"定型","歳時記",{w:"五・七・五の定型や季語にとらわれず、自由な音律でよむ俳句。"}],
+aj6:[{w:"身分や立場の違いによって生まれた、心の隔たり。"},{w:"誤解から生まれた物語が、相手への敵対意識を強め、争いを引き起こすから。"},{w:"一面の菜の花畑で、東から月がのぼり、西に日が沈む春の夕暮れ。"},{w:"（例）自分の目で確かめ、相手の立場に立って考えたい。うわさや思い込みで判断すると誤解が生まれるから。"}],
+am1:[{m:["3"]},{m:["5"]},{m:["7"]},{m:["4"]},{m:["√15"]},{m:["3√2"]},{m:["3"]},{m:["2√3"]},{m:["3√3"]},{m:["3√5"]},{m:["5√2"]},{m:["6√2"]},{m:["√12"]},{m:["√18"]},{m:["30"]}],
+am2:[{m:["7√3"]},{m:["3√2"]},{m:["5√2"]},{m:["5√3"]},{m:["3√2"]},{m:["5√6"]},{m:["0"]},{m:["3√3"]},{m:["5√5"]},{m:["3√5"]}],
+am3:[{m:["4+2√3","2√3+4"]},{m:["9-4√5","-4√5+9"]},{m:["-2"]},{m:["5"]},{m:["5"]},{m:["5+4√2","4√2+5"]},{m:["2+2√3","2√3+2"]},{m:["9+4√5","4√5+9"]},{m:["5-2√6","-2√6+5"]},{m:["4-3√3","-3√3+4"]}],
+am4:[{m:["3√2"]},{m:["2√5"]},{m:["√3"]},{m:["√6/3"]},{m:["√2"]},{m:["2√6"]},{m:["√15/6"]},{m:["2√3"]},{m:["2"]},{m:["4√3"]},{m:["12"]},{m:["√5"]},{m:["5"]}],
+am5:[{m:["5"]},{m:["3"]},{m:["5"]},{m:["6"]},{s:["5","6","7","8"]},{s:["2","9","14","17","18"]},{s:["1","6","9","10"]},{s:["2","√7-2"]},{s:["3","√13-3"]}],
+am6:[{s:["2","3"]},{s:["3","-5"]},{m:["±3","3,-3","-3,3"]},{s:["0","5"]},{m:["3±√5"]},{m:["(-3±√5)/2","-3±√5/2"]},{m:["(-2±√6)/2","-2±√6/2"]},{m:["-3±√10"]},{m:["(5±√13)/6","5±√13/6"]},
+ {s:["-2","1"]},{s:["5","-2"]},{s:["1","-4"]},{s:["-5","3"]},{s:["12","13"]},{m:["5"]}],
+ae1:["company","clothing","condition","fair","moreover","endangered","population","safely","rapidly","result","interview","recycle","mistake","impact","extinction","challenge","citizen","native","research","ecosystem","century","release","nowadays","continue"].map(w=>({e:[w]})),
+ae2:[["played, played"],["studied, studied"],["knew, known"],["saw, seen"],["made, made"],["wrote, written"],["ate, eaten"],["took, taken"],["heard, heard"],["was, been","were, been","was/were, been","was were, been"],["did, done"],["became, become"],["began, begun"],["visited, visited"],["lived, lived"]].map(v=>({e:v})),
+ae3:[{e:["played","I played soccer yesterday."]},{e:["have lived","I have lived here since 2015."]},{e:["will be","It will be rainy tomorrow."]},{e:["has been reading","She has been reading a book for two hours."]},
+ {e:["for","I have lived here for five years."]},{e:["since","I have lived here since 2020."]},{e:["seen","Have you ever seen a koala?"]},{e:["already","I have already finished lunch."]},{e:["yet","I haven't finished it yet."]},
+ {e:["He has been watching TV since this morning.","He's been watching TV since this morning."]},{e:["I have lived in Tokyo for three years.","I've lived in Tokyo for three years.","I have lived in Tokyo for 3 years."]},{e:["They will be busy tomorrow.","They'll be busy tomorrow."]},
+ {e:["I have visited Kyoto twice.","I've visited Kyoto twice.","I have been to Kyoto twice."]},{e:["Have you finished your homework yet?"]}],
+ae4:[{e:["It is easy for me to swim."]},{e:["It is important for us to study English."]},{e:["I want you to come to the party."]},{e:["My father wants me to be a doctor."]},{e:["Let me try it."]},{e:["She helped me clean the room."]},
+ {e:["It is difficult for me to speak English.","It's difficult for me to speak English.","It is hard for me to speak English."]},{e:["It is fun for them to play soccer.","It's fun for them to play soccer."]},{e:["I want him to help me."]},
+ {e:["My mother wants me to go to bed early.","My mother wants me to sleep early."]},{e:["Let me see your pictures.","Let me see your picture.","Let me see your photos.","Let me see your photo.","Please let me see your pictures.","Please let me see your photos."]},
+ {e:["My brother helped me do my homework.","My brother helped me with my homework.","My big brother helped me do my homework.","My older brother helped me do my homework."]}],
+ae5:[{w:"私はちょうど宿題を終えたところだ。"},{w:"私は2時間ずっと英語を勉強している。"},{w:"母は私に（私の）部屋をそうじしてほしいと思っている。"},{w:"私たちにとって自然を守ることは大切だ。"},{w:"それについて私に知らせてください。"},{w:"あなたは沖縄に行ったことがありますか。"}],
+ae6:[["子ども","子供","小さいころ"],{s:["家族","動物園"]},["森"],{e:["He is making a report.","He is making a report for his class.","He's making a report.","He's making a report for his class.","A report.","A report for his class."]},"イ",{w:"私は友達にもそれについて考えてほしい。"}],
+bs1:["1929","1931","1937","1941",["1946年11月3日","1946/11/3"],["1947年5月3日","1947/5/3"],"1951","1989",{o:["イエアウ"]},{o:["イウアエ"]},{o:["イアウエ"]},{o:["エイウア"]}],
+bs2:["政党政治","リットン","1933",["溥儀","ふぎ"],"三国同盟","日ソ中立条約","abcd","配給","学徒出陣","沖縄","ヤルタ",["8月15日","8/15"]],
+bs3:[["極東国際軍事裁判","東京裁判"],"人間宣言","治安維持法","労働組合法","警察予備隊","第五福竜丸","安保闘争","日韓基本条約","佐藤栄作","日中平和友好条約","キューバ危機","ベトナム戦争"],
+bs4:["三種の神器","四大公害","環境庁","第四次中東戦争","貿易摩擦","ベルリンの壁","1990","1991","湾岸戦争",["pko","国際平和協力法"],"阪神淡路大震災","東日本大震災","マルタ会談"],
+bs5:["グローバル化","情報化","情報リテラシー",["全会一致","全員一致"],"多数決",{s:["効率","公正"]},"統治二論","三権分立","社会契約論","社会権","ワイマール憲法","独立宣言","人権宣言",["権利章典","権利の章典"]],
+bs6:[{w:"アメリカはニューディール政策で公共事業をおこして失業者を減らし、イギリスは植民地との貿易を強め、外国の商品に高い関税をかけた（ブロック経済）。"},
+ {w:"五か年計画による計画経済を進めていたので、世界恐慌の影響を受けなかったから。"},{w:"政党政治が終わり、軍部が政治に強い発言力をもつようになった。"},
+ {w:"地主の土地が国に買い上げられて小作人に安く売られ、自作農が大幅に増えた。"},{w:"（例）工場の排水やけむりで公害が発生し、水俣病などの健康被害が起こった。"},{w:"少数意見も十分に聞いて尊重する。多数の意見が正しいとは限らないから。"}],
+bc1:["H+","Na+","K+","Ag+","NH4+","Mg2+","Cu2+","Zn2+","Ca2+","Ba2+","Cl-","OH-","SO42-","CO32-"].map(x=>({c:[x]})).concat(["陽イオン","陰イオン",{c:["Na+"]},{c:["Cl-"]},{c:["Cu2+"]}]),
+bc2:["HCl→H++Cl-","NaOH→Na++OH-","KOH→K++OH-","NaCl→Na++Cl-","CuCl2→Cu2++2Cl-","H2SO4→2H++SO42-","HNO3→H++NO3-","Ba(OH)2→Ba2++2OH-","CuSO4→Cu2++SO42-","ZnSO4→Zn2++SO42-"].map(x=>({c:[x]})),
+bc3:[{c:["Zn→Zn2++2e-"]},{c:["Cu2++2e-→Cu"]},{c:["Mg→Mg2++2e-"]},{o:["マグネシウム亜鉛銅","mgzncu"]},"銅","亜鉛",{o:["亜鉛板から銅板へ","亜鉛板から銅板","亜鉛から銅へ","亜鉛から銅","亜鉛板銅板","亜鉛銅"]},
+ {o:["銅板から亜鉛板へ","銅板から亜鉛板","銅から亜鉛へ","銅から亜鉛","銅板亜鉛板","銅亜鉛"]},"濃く",["うすく","薄く"],{w:"2つの水溶液がすぐに混ざらないようにする。イオンは通過させて、電気的なかたよりをなくす。"},{s:["一次電池","二次電池"]},
+ {c:["2H2O→2H2+O2"]},{c:["2H2+O2→2H2O"]},{w:"水しか生じないので、有害な物質を出さないから。"}],
+bc4:[{c:["H+"]},{c:["OH-"]},{s:["黄","緑","青"]},"赤","赤",{m:["7"]},"大きく",{c:["H2"]},{c:["HCl+NaOH→NaCl+H2O"]},{c:["H++OH-→H2O"]},{c:["H2SO4+Ba(OH)2→BaSO4+2H2O"]},"硫酸バリウム",
+ ["塩化物イオン","cl-"],["水素イオン","h+"],["ナトリウムイオン","na+"],"塩化ナトリウム"],
+bc5:[{m:["6"]},{m:["0.005"]},{m:["1200"]},{m:["3000"]},{m:["500"]},{m:["0.8"]},{m:["1","1.0"]},"大きく",["変わらない","かわらない"],{w:"水圧は深いほど大きいので、物体の下面にはたらく上向きの水圧が、上面にはたらく下向きの水圧より大きいから。"},
+ {m:["8"]},{s:["2","5"]},{s:["平行四辺形","対角線"]},{s:["大き","小さ"]},{m:["0"]}],
+bc6:[{w:"酸の陰イオンとアルカリの陽イオンが結びついてできた物質。"},{w:"酸の水素イオンとアルカリの水酸化物イオンが結びついて水ができ、たがいの性質を打ち消し合う反応。"},{w:"物質がもっている化学エネルギーを、化学変化によって電気エネルギーに変えて取り出す装置。"}]
+};
+
+const KEY="nnbm-testprep-2026-09";
+let store={};
+try{store=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){store={}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}}
+
+let current="d1";try{const c=localStorage.getItem(KEY+"-set");if(c&&SETS.some(x=>x.id===c))current=c}catch(e){}
+let onlyWrong=false;
+const tabs=document.getElementById("setTabs"), main=document.getElementById("main");
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+const fmt=s=>{const a=Math.abs(s);return (s<0?"−":"")+Math.floor(a/60)+":"+String(a%60).padStart(2,"0")};
+const qOf=q=>typeof q==="string"?{q}:q;
+
+// --- 正規化と判定 ---
+function base(x){return String(x||"").normalize("NFKC").replace(/[−–—‐]/g,"-").toLowerCase().replace(/\s+/g,"")}
+function nText(x){return base(x).replace(/[。．「」『』・、,，]/g,"")}
+function nMath(x){return base(x).replace(/^[a-z]=/,"").replace(/(cm2|cm|個|pa|n)$/,"").replace(/[，、]/g,",")}
+function nChem(x){return base(x).replace(/->|=>|＝|=/g,"→").replace(/e⁻/g,"e-")}
+function nEng(x){return base(x).replace(/[.,?!'’"]/g,"")}
+function nOrd(x){return base(x).replace(/[>＞,、→・]/g,"")}
+function norm1(x){return nText(x).replace(/[()（）]/g,"")}
+function keyOf(sec,i){const k=(KEYS[sec]||[])[i];return k===undefined?null:k}
+function judge(k,ans){
+  if(k==null)return null;
+  if(!String(ans||"").trim())return 0;
+  if(typeof k==="string"||Array.isArray(k)){const v=[].concat(k),a=norm1(ans);return v.some(x=>a.includes(norm1(x)))?1:0}
+  if(k.w)return null;
+  if(k.m){const a=nMath(ans);return k.m.some(x=>nMath(x)===a||nMath(x).replace(/[()]/g,"")===a.replace(/[()]/g,""))?1:0}
+  if(k.c){const a=nChem(ans);return k.c.some(x=>nChem(x)===a||(!a.includes("→")&&nChem(x).includes("→")&&nChem(x).split("→")[1]===a&&/^[a-z]/.test(nChem(x))&&!/e-/.test(nChem(x))))?1:0}
+  if(k.e){const a=nEng(ans);return k.e.some(x=>nEng(x)===a)?1:0}
+  if(k.o){const a=nOrd(ans);return k.o.some(x=>nOrd(x)===a)?1:0}
+  if(k.s){const a=norm1(ans).replace(/,/g,"、");return k.s.every(p=>[].concat(p).some(x=>a.includes(norm1(x))))?1:0}
+  return null;
+}
+function showKey(k){
+  if(k==null)return "";
+  if(typeof k==="string")return k;
+  if(Array.isArray(k))return k[0];
+  if(k.w)return k.w; if(k.m)return k.m[0]; if(k.c)return k.c[0]; if(k.e)return k.e[0]; if(k.o)return k.o[0];
+  if(k.s)return k.s.map(p=>[].concat(p)[0]).join("、");
+  return "";
+}
+// 最終判定：手動の○×があればそれを優先
+function findSec(id){for(const st of SETS){const x=st.secs.find(t=>t.id===id);if(x)return x}return null}
+function isHand(sec){const x=findSec(sec);return !!(x&&x.hand)}
+function result(id,sec,i){
+  if(store["m_"+id]!==undefined)return store["m_"+id];
+  if(!store["g_"+sec])return undefined;
+  if(isHand(sec))return null;
+  return judge(keyOf(sec,i),store[id]);
+}
+
+function renderTabs(){
+  tabs.innerHTML="";
+  SETS.forEach(s=>{const b=document.createElement("button");b.textContent=s.tab;b.setAttribute("role","tab");b.setAttribute("aria-selected",s.id===current);
+    b.onclick=()=>{current=s.id;try{localStorage.setItem(KEY+"-set",current)}catch(e){};renderTabs();render();window.scrollTo(0,0)};tabs.appendChild(b)});
+  const w=document.createElement("button");w.textContent=onlyWrong?"すべての問題を表示":"間違い直し（×と自信なしだけ表示）";
+  w.onclick=()=>{onlyWrong=!onlyWrong;renderTabs();render();window.scrollTo(0,0)};tabs.appendChild(w);
+}
+
+function secScore(sec){
+  let ok=0,ng=0,pend=0;
+  sec.qs.forEach((q,i)=>{const id=sec.id+"_"+(i+1),r=result(id,sec.id,i);if(r===1)ok++;else if(r===0)ng++;else pend++});
+  return {ok,ng,pend,n:sec.qs.length};
+}
+
+function render(){
+  const set=SETS.find(s=>s.id===current);
+  let h=`<div class="plan">${set.planTitle||"この日の流れ（各教科50分）"}<ol>${set.plan.map(p=>`<li>${p}</li>`).join("")}</ol>
+  <p class="howto">単元ごとに解き終わったら「この単元を採点」を押す。自動の判定がちがうときは ○／× で直せます。記述は模範解答を見て ○／× を付けてください。</p></div>`;
+  set.secs.forEach(sec=>{
+    const el=(store["t_"+sec.id]||0), graded=!!store["g_"+sec.id], sc=secScore(sec);
+    let body="";
+    sec.qs.forEach((q,i)=>{
+      const o=qOf(q), id=sec.id+"_"+(i+1), v=store[id]||"", u=store["u_"+id], k=keyOf(sec.id,i), r=result(id,sec.id,i);
+      if(onlyWrong&&!(r===0||u))return;
+      const nf=`name="f${Math.random().toString(36).slice(2)}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-form-type="other" aria-label="${i+1}の答え"`;
+      const field=sec.hand?`<span class="handnote">ノートに書く</span>`:o.long?`<textarea data-k="${id}" ${nf}>${esc(v)}</textarea>`:`<input type="search" inputmode="text" data-k="${id}" value="${esc(v)}" ${nf}>`;
+      let mark="";
+      if(graded){
+        const cls=r===1?"ok":r===0?"ng":"chk", lab=r===1?"○":r===0?"×":"要確認";
+        const hide=r===0&&!sec.hand&&!store["re_"+id]&&!store["sk_"+id];
+        mark=`<div class="res ${cls}"><span class="badge">${lab}</span>${hide?`<span class="key">正答：<button class="peek" data-show="${id}">先にやり直してから見る（どうしても分からないときだけ押す）</button></span>`:`<span class="key">正答：${esc(showKey(k))}</span>`}
+        <span class="ov"><button data-ov="${id}" data-v="1" aria-label="正解にする">○</button><button data-ov="${id}" data-v="0" aria-label="不正解にする">×</button></span></div>`;
+        if(r===0&&!sec.hand){const rv=store["re_"+id]||"",rr=store["re_"+id]!==undefined&&k&&!k.w?judge(k,rv):null;
+          mark+=`<div class="row redo"><input type="search" data-re="${id}" data-sec="${sec.id}" data-i="${i}" value="${esc(rv)}" placeholder="やり直し：もう一度書いてみよう" ${nf}><span class="redo-r">${rr===1?"○ できた":rr===0?"× もう一度":""}</span></div>`}
+      }
+      body+=`<div class="q"><p class="qt"><b>${i+1}</b>${esc(o.q).replace(/\n/g,"<br>")}</p>
+      <div class="row">${field}<label class="unsure"><input type="checkbox" data-u="${id}" ${u?"checked":""}>自信なし</label></div>${mark}</div>`;
+    });
+    if(onlyWrong&&!body)return;
+    h+=`<section class="sec" style="--c:var(${sec.c})"><h2>${esc(sec.t)}</h2>
+    <div class="meta"><span class="tag">${sec.sub}</span><span>目安 ${sec.min}分</span>
+    ${graded?`<span class="score">${sc.ok}／${sc.n} 正解${sc.pend?`（要確認 ${sc.pend}）`:""}</span>`:""}
+    <span class="timer"><output id="o_${sec.id}">${fmt(sec.min*60-el)}</output><button data-t="${sec.id}">スタート</button></span></div>
+    ${sec.note?`<p class="note">${esc(sec.note).replace(/\n/g,"<br>")}</p>`:""}${body}
+    <div class="secfoot"><button class="grade" data-g="${sec.id}">${graded?"採点をやり直す":sec.hand?"答えを見る":"この単元を採点"}</button></div></section>`;
+  });
+  h+=`<div class="done"><button id="gradeAll" class="ghost">全部まとめて採点</button><button id="anaBtn">分析を見る</button><button id="copyBtn">分析データをコピー</button><button class="ghost" id="resetBtn">このタブの答えを消す</button><span class="saved" id="savedMsg"></span></div>
+  <div id="ana"></div><textarea id="exportBox" readonly></textarea>`;
+  main.innerHTML=h;
+  bind(set);
+}
+
+const timers={};
+function bind(set){
+  main.querySelectorAll("[data-k],[data-re]").forEach(f=>{f.readOnly=true;f.addEventListener("focus",()=>{f.readOnly=false},{once:true})});
+  main.querySelectorAll("[data-k]").forEach(f=>f.addEventListener("input",()=>{store[f.dataset.k]=f.value;save()}));
+  main.querySelectorAll("[data-re]").forEach(f=>{
+    f.addEventListener("input",()=>{store["re_"+f.dataset.re]=f.value;save()});
+    f.addEventListener("change",()=>{store["re_"+f.dataset.re]=f.value;save();keepScroll(render)});
+  });
+  main.querySelectorAll("[data-u]").forEach(c=>c.addEventListener("change",()=>{store["u_"+c.dataset.u]=c.checked;save()}));
+  main.querySelectorAll("[data-show]").forEach(b=>b.onclick=()=>{store["sk_"+b.dataset.show]=1;save();keepScroll(render)});
+  main.querySelectorAll("[data-ov]").forEach(b=>b.onclick=()=>{store["m_"+b.dataset.ov]=+b.dataset.v;save();keepScroll(render)});
+  main.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{const id=b.dataset.g;
+    if(store["g_"+id]&&!confirm("自分で付けた○×を消して、採点をやり直しますか？"))return;
+    const sec=set.secs.find(s=>s.id===id);sec.qs.forEach((q,i)=>delete store["m_"+id+"_"+(i+1)]);
+    store["g_"+id]=Date.now();save();keepScroll(render)});
+  main.querySelectorAll("[data-t]").forEach(b=>{
+    const id=b.dataset.t, sec=set.secs.find(s=>s.id===id);
+    if(timers[id])b.textContent="一時停止";
+    b.onclick=()=>{
+      if(timers[id]){clearInterval(timers[id]);delete timers[id];b.textContent="再開";return}
+      timers[id]=setInterval(()=>{store["t_"+id]=(store["t_"+id]||0)+1;save();const o=document.getElementById("o_"+id);if(o){const r=sec.min*60-store["t_"+id];o.textContent=fmt(r);o.classList.toggle("over",r<0)}},1000);
+      b.textContent="一時停止";
+    };
+  });
+  document.getElementById("gradeAll").onclick=()=>{set.secs.forEach(sec=>{if(!store["g_"+sec.id])store["g_"+sec.id]=Date.now()});save();render();showAna(set)};
+  document.getElementById("anaBtn").onclick=()=>showAna(set);
+  document.getElementById("copyBtn").onclick=()=>exportSet(set);
+  document.getElementById("resetBtn").onclick=()=>{
+    if(!confirm("このタブの答え・採点・時間をすべて消します。よろしいですか？"))return;
+    Object.keys(store).forEach(k=>{if(set.secs.some(sc=>k===sc.id||k.endsWith("_"+sc.id)||k.includes(sc.id+"_")))delete store[k]});save();render();
+  };
+}
+function keepScroll(fn){const y=window.scrollY;fn();window.scrollTo(0,y)}
+
+function analyze(set){
+  const subj={},rows=[],wrong=[];
+  set.secs.forEach(sec=>{
+    const sc=secScore(sec),t=store["t_"+sec.id]||0;let uns=0,confWrong=0,blank=0;
+    sec.qs.forEach((q,i)=>{const id=sec.id+"_"+(i+1),r=result(id,sec.id,i),u=!!store["u_"+id],a=sec.hand?"（ノートに手書き）":(store[id]||"").trim();
+      if(u)uns++; if(!a)blank++; if(r===0&&!u&&a)confWrong++;
+      if(r===0||u||r===null)wrong.push({sub:sec.sub,sec:sec.t,no:i+1,q:qOf(q).q.replace(/\n/g," "),a:a||"（無回答）",k:showKey(keyOf(sec.id,i)),r,u,re:store["re_"+id]});
+    });
+    const graded=!!store["g_"+sec.id];
+    rows.push({sub:sec.sub,t:sec.t,min:sec.min,time:t,graded,...sc,uns,confWrong,blank});
+    const S=subj[sec.sub]||(subj[sec.sub]={ok:0,n:0,time:0,uns:0,confWrong:0,pend:0,graded:0});
+    S.ok+=sc.ok;S.n+=sc.n;S.time+=t;S.uns+=uns;S.confWrong+=confWrong;S.pend+=graded?sc.pend:0;S.graded+=graded?1:0;
+  });
+  return {subj,rows,wrong};
+}
+const pct=(a,b)=>b?Math.round(a*100/b):0;
+function showAna(set){
+  const A=analyze(set),box=document.getElementById("ana");
+  let h=`<div class="anabox"><h3>分析</h3><table><thead><tr><th>教科</th><th>正答率</th><th>正解</th><th>時間</th><th>自信なし</th><th>思い込みミス</th></tr></thead><tbody>`;
+  Object.entries(A.subj).forEach(([k,S])=>{h+=`<tr><td>${k}</td><td><span class="bar" style="--p:${pct(S.ok,S.n)}%"></span>${pct(S.ok,S.n)}%</td><td>${S.ok}/${S.n}</td><td>${Math.round(S.time/60)}分</td><td>${S.uns}</td><td>${S.confWrong}</td></tr>`});
+  h+=`</tbody></table><p class="note">「思い込みミス」は、答えを書いて自信なしにもチェックしていないのに間違えた問題の数です。覚え違いの可能性が高いので優先して復習します。</p>
+  <h4>単元別（正答率の低い順）</h4><table><thead><tr><th>単元</th><th>正答率</th><th>時間／目安</th></tr></thead><tbody>`;
+  [...A.rows].filter(r=>r.graded).sort((a,b)=>pct(a.ok,a.n)-pct(b.ok,b.n)).forEach(r=>{h+=`<tr><td>${r.sub}｜${esc(r.t)}</td><td>${pct(r.ok,r.n)}%</td><td>${Math.round(r.time/60)}分／${r.min}分</td></tr>`});
+  h+=`</tbody></table>${A.rows.some(r=>!r.graded)?`<p class="note">まだ採点していない単元があります。</p>`:""}</div>`;
+  box.innerHTML=h;box.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function exportSet(set){
+  const A=analyze(set);const d=new Date();
+  let t=`【分析データ】${set.tab}（出力 ${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}）\n\n■教科別\n`;
+  Object.entries(A.subj).forEach(([k,S])=>{t+=`${k}：正答率${pct(S.ok,S.n)}%（${S.ok}/${S.n}）時間${Math.round(S.time/60)}分 自信なし${S.uns} 思い込みミス${S.confWrong}${S.pend?` 要確認${S.pend}`:""}${S.graded?"":"（未採点）"}\n`});
+  t+=`\n■単元別\n`;
+  A.rows.forEach(r=>{t+=`${r.sub}｜${r.t}：${r.graded?`${r.ok}/${r.n}（${pct(r.ok,r.n)}%）`:"未採点"} 時間${Math.floor(r.time/60)}分${r.time%60}秒／目安${r.min}分 自信なし${r.uns} 無回答${r.blank}\n`});
+  t+=`\n■間違い・自信なし・要確認の問題\n`;
+  A.wrong.forEach(w=>{const lab=w.r===0?"×":w.r===1?"○":"要確認";
+    t+=`[${w.sub}｜${w.sec} ${w.no}] ${lab}${w.u?"・自信なし":""}\n　問題：${w.q}\n　解答：${w.a.replace(/\n/g," ")}\n　正答：${w.k}${w.re!==undefined?`\n　やり直し：${w.re}`:""}\n`});
+  const box=document.getElementById("exportBox"), msg=document.getElementById("savedMsg");
+  box.value=t;box.style.display="block";
+  const ok=()=>{msg.textContent="コピーしました。チャットに貼り付けてください。"};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,()=>{box.select();msg.textContent="下の文字を全部選んでコピーしてください。"})}
+  else{box.select();try{document.execCommand("copy");ok()}catch(e){msg.textContent="下の文字を全部選んでコピーしてください。"}}
+}
+
+// 記号パッド
+const SYMS=["√","²","³","±","−","×","÷","/","(",")","⁺","⁻","²⁺","₂","₃","₄","→","e⁻"];
+const pad=document.getElementById("pad");let lastField=null;
+SYMS.forEach(s=>{const b=document.createElement("button");b.type="button";b.textContent=s;b.setAttribute("aria-label",s+" を入力");
+  b.addEventListener("mousedown",e=>e.preventDefault());b.addEventListener("touchstart",e=>e.preventDefault(),{passive:false});
+  const ins=()=>{if(!lastField)return;const f=lastField,st=f.selectionStart??f.value.length,en=f.selectionEnd??f.value.length;
+    f.setRangeText(s,st,en,"end");f.dispatchEvent(new Event("input"));f.focus()};
+  b.addEventListener("click",ins);b.addEventListener("touchend",e=>{e.preventDefault();ins()});pad.appendChild(b)});
+document.addEventListener("focusin",e=>{const f=e.target;if(f.matches&&f.matches("[data-k],[data-re]")){const sec=(f.dataset.k||f.dataset.re).slice(0,2);lastField=f;{const x=findSec((f.dataset.k||f.dataset.re).split("_")[0]);pad.classList.toggle("on",!!x&&["数学","理科"].includes(x.sub))}}});
+document.addEventListener("focusout",()=>setTimeout(()=>{if(!document.activeElement||!document.activeElement.matches("[data-k],[data-re]"))pad.classList.remove("on")},150));
+
+renderTabs();render();
+</script>
+</body>
+</html>

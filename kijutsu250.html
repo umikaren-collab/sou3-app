@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>手書き一問一答</title>
+<style>
+:root{
+  --bg:#f4f1ea; --card:#fffdf8; --ink:#1f2a33; --sub:#6b7680; --line:#ddd6c8;
+  --accent:#1f6f78; --ok:#2e8b57; --ng:#c0392b; --warn:#b7791f;
+  --kokugo:#b5473a; --sugaku:#2f6db5; --eigo:#7a4fb0; --shakai:#3d8b4f; --rika:#c47a1c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Hiragino Sans","Noto Sans JP","Yu Gothic UI",sans-serif;-webkit-user-select:none;user-select:none}
+button{font-family:inherit;cursor:pointer;border:none}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+h1{font-size:22px;letter-spacing:.04em}
+.total{font-size:15px;color:var(--sub)}
+.total b{font-size:26px;color:var(--ink)}
+.btn{padding:12px 18px;border-radius:10px;font-size:16px;font-weight:700;background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.btn.ng{background:var(--ng);color:#fff;border-color:var(--ng)}
+.btn:disabled{opacity:.45;cursor:default}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.subj{background:var(--card);border-radius:14px;padding:16px;border-top:6px solid var(--c);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.subj h2{font-size:20px;display:flex;justify-content:space-between;align-items:baseline}
+.subj h2 span{font-size:15px;color:var(--sub);font-weight:400}
+.subj h2 span b{color:var(--c);font-size:22px}
+.sets{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.setbtn{padding:10px 2px;border-radius:10px;background:#fff;border:2px solid var(--line);font-size:14px;line-height:1.35}
+.setbtn small{display:block;font-size:12px;color:var(--sub)}
+.setbtn .sc{font-size:16px;font-weight:700;color:var(--c)}
+.setbtn.done{border-color:var(--c)}
+.note{margin-top:16px;font-size:13px;color:var(--sub);line-height:1.7}
+.hidden{display:none!important}
+
+/* quiz */
+.qtop{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.tag{padding:4px 12px;border-radius:999px;color:#fff;font-weight:700;font-size:14px;background:var(--c)}
+.prog{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--c);transition:width .3s}
+.qcount{font-weight:700;font-size:15px;min-width:60px;text-align:right}
+.qcard{background:var(--card);border-radius:14px;padding:18px 20px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.qsetname{font-size:13px;color:var(--sub);margin-bottom:6px}
+.qtext{font-size:22px;line-height:1.6;font-weight:600;user-select:text;-webkit-user-select:text}
+.qtext em{font-style:normal;border-bottom:3px solid var(--c);padding:0 2px}
+.padwrap{position:relative;background:#fff;border-radius:14px;border:2px solid var(--line);overflow:hidden}
+.padwrap.locked{opacity:.85}
+canvas#pad{display:block;width:100%;height:330px;touch-action:none;background:
+  repeating-linear-gradient(#fff 0 81px,#e9eef2 81px 83px)}
+.padhint{position:absolute;left:14px;top:10px;font-size:13px;color:#a9b2ba;pointer-events:none}
+.tools{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.tools .sp{flex:1}
+.res{background:var(--card);border-radius:14px;padding:14px 18px;margin-top:10px;border-left:8px solid var(--line)}
+.res.ok{border-left-color:var(--ok)}
+.res.ng{border-left-color:var(--ng)}
+.res .mark{font-size:30px;font-weight:900;margin-right:8px}
+.res.ok .mark{color:var(--ok)} .res.ng .mark{color:var(--ng)}
+.res .row{font-size:17px;margin-top:6px;line-height:1.6}
+.res .row b{color:var(--sub);font-weight:600;font-size:14px;margin-right:6px}
+.res .cmt{font-size:15px;color:var(--sub);margin-top:6px}
+.res .fix{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.spinner{display:inline-block;width:18px;height:18px;border:3px solid #fff;border-top-color:transparent;border-radius:50%;animation:sp 1s linear infinite;vertical-align:-3px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* result */
+.big{font-size:64px;font-weight:900;color:var(--c);text-align:center;margin:10px 0}
+.big small{font-size:24px;color:var(--sub)}
+table.rv{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;font-size:15px}
+table.rv td,table.rv th{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.rv th{background:#efe9dc;font-size:13px;color:var(--sub)}
+table.rv img{max-height:60px;max-width:220px;border:1px solid var(--line);border-radius:6px;background:#fff}
+.m-ok{color:var(--ok);font-weight:900;font-size:20px}.m-ng{color:var(--ng);font-weight:900;font-size:20px}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
+.mbox{background:var(--card);border-radius:14px;padding:22px;max-width:520px;width:100%}
+.mbox h3{margin-bottom:12px}
+.mbox label{display:block;font-size:14px;color:var(--sub);margin-top:12px}
+.mbox input[type=text],.mbox input[type=password]{width:100%;padding:10px;font-size:16px;border:2px solid var(--line);border-radius:8px;margin-top:4px;user-select:text;-webkit-user-select:text}
+.mbox .chk{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:15px;color:var(--ink)}
+.mbox .chk input{width:22px;height:22px}
+.mbox .acts{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.mbox p{font-size:13px;color:var(--sub);line-height:1.6;margin-top:8px}
+.timer{font-weight:800;font-size:17px;font-variant-numeric:tabular-nums;padding:5px 12px;border-radius:9px;background:#fff;border:2px solid var(--line);min-width:84px;text-align:center}
+.timer.warn{color:var(--warn);border-color:var(--warn)}
+.timer.over{color:#fff;background:var(--ng);border-color:var(--ng)}
+.timer.paused{opacity:.55}
+.autobar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:10px}
+.autobar i{display:block;height:100%;width:0;background:var(--ok);animation:fill linear forwards}
+@keyframes fill{to{width:100%}}
+.ansbox{margin-top:12px;padding:14px 16px;border-radius:12px;background:#fff6e5;border:2px dashed var(--warn);font-size:30px;font-weight:800;letter-spacing:.06em;text-align:center}
+.inst{margin-top:8px;font-size:16px;color:var(--sub)}
+.lines{margin-top:6px;font-size:17px;line-height:1.8}
+.trainbox{background:var(--card);border-radius:14px;padding:16px 18px;margin-bottom:14px;border:3px solid var(--c);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.trainbox .t{flex:1;min-width:220px;font-size:15px;line-height:1.6}
+.trainbox .t b{font-size:18px}
+.mbox{max-height:92vh;overflow:auto}
+.mbox select{width:100%;padding:9px;font-size:16px;border:2px solid var(--line);border-radius:8px;margin-top:4px;background:#fff}
+.mbox .two{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.today{background:var(--card);border-radius:14px;padding:16px;margin-bottom:14px;border:3px solid var(--accent)}
+.today .th{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.today .th b{font-size:20px}
+.today .th span{font-size:14px;color:var(--sub)}
+.tlist{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+.tbtn{padding:12px 4px;border-radius:10px;background:#fff;border:2px solid var(--c);font-size:16px;font-weight:700;color:var(--c);line-height:1.4}
+.tbtn small{display:block;font-size:12px;color:var(--sub);font-weight:400}
+.tbtn.done{background:var(--c);color:#fff}
+.tbtn.done small{color:#fff}
+.tsum{margin-top:10px;font-size:15px;color:var(--sub);text-align:right}
+.tsum b{font-size:22px;color:var(--ink)}
+.steps{margin-top:10px;display:grid;gap:10px}
+.tsub{margin-top:4px;font-size:14px;color:var(--sub)}
+.cd{font-size:14px;color:var(--sub);background:#fff6e5;border:2px solid var(--warn);border-radius:999px;padding:3px 12px}
+.cd b{color:var(--warn);font-size:16px}
+.step{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 12px;border-radius:12px;background:#fff;border:2px solid var(--line)}
+.step.cur{border-color:var(--accent)}
+.step.fin{opacity:.75}
+.step .no{font-weight:900;font-size:18px;color:var(--accent);min-width:26px}
+.step .lb{font-weight:700;font-size:16px;min-width:150px}
+.step .lb small{display:block;font-weight:400;font-size:12px;color:var(--sub)}
+.step .tlist{flex:1;margin-top:0}
+.step .st{font-size:14px;color:var(--sub)}
+.mc{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.mc button{padding:22px 10px;border-radius:14px;background:#fff;border:3px solid var(--line);font-size:22px;font-weight:700;color:var(--ink)}
+.mc button.right{background:var(--ok);border-color:var(--ok);color:#fff}
+.mc button.wrong{background:var(--ng);border-color:var(--ng);color:#fff}
+.mc button:disabled{cursor:default}
+.ebox{background:var(--card);border-radius:14px;padding:16px 18px;margin-top:14px;border-left:8px solid var(--accent)}
+.ectl{display:flex;gap:8px;flex-wrap:wrap}
+.etext{margin-top:12px;font-size:18px;line-height:1.9;white-space:pre-wrap}
+.lcards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:8px}
+.lcard{background:var(--card);border-radius:12px;padding:12px 14px;border:2px solid var(--line)}
+.lcard small{display:block;font-size:12px;color:var(--sub)}
+.lcard b{font-size:22px}
+.lh{margin:22px 0 8px;font-size:17px}
+.ltab td,.ltab th{text-align:center;padding:8px 6px}
+.ltab td:last-child,.ltab th:last-child{text-align:left}
+.ltab td.good{color:var(--ok);font-weight:800}.ltab td.bad{color:var(--ng);font-weight:800}
+.ldet{margin-top:6px}.ldet summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:14px}
+.ldet .etext{font-size:15px;line-height:1.8;margin:6px 0}
+@media (max-width:640px){.lcards{grid-template-columns:1fr 1fr}.ltab{font-size:13px}}
+@media (max-width:640px){.mc{grid-template-columns:1fr}.step .lb{min-width:0}}
+@media (max-width:640px){.tlist{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:640px){.qtext{font-size:19px}canvas#pad{height:260px}}
+</style>
+</head>
+<body>
+
+<!-- ===== HOME ===== -->
+<div id="home" class="wrap">
+  <header>
+    <div>
+      <h1>手書き一問一答</h1>
+      <div class="total">自由練習（基本セット）の合計 <b id="grand">0</b> / 350点</div>
+    </div>
+    <div style="display:flex;gap:8px"><button class="btn" onclick="openLog()">📖 記録</button><button class="btn" onclick="openSettings()">⚙ 設定</button></div>
+  </header>
+  <div id="today"></div>
+  <div class="grid" id="subjGrid"></div>
+  <div class="note" id="modeNote"></div>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div id="quiz" class="wrap hidden">
+  <div class="qtop">
+    <button class="btn" onclick="quitQuiz()">✕</button>
+    <span class="tag" id="qTag"></span>
+    <div class="prog"><i id="qProg"></i></div>
+    <span class="qcount" id="qCount"></span>
+    <span class="timer hidden" id="qTimer"></span>
+  </div>
+  <div class="qcard">
+    <div class="qsetname" id="qSetName"></div>
+    <div class="qtext" id="qText"></div>
+  </div>
+  <div class="padwrap" id="padWrap">
+    <canvas id="pad"></canvas>
+    <div class="padhint" id="padHint">ここに答えを書いてください</div>
+  </div>
+  <div class="tools" id="tools">
+    <button class="btn" onclick="undo()">↶ 1画もどす</button>
+    <button class="btn" onclick="clearPad()">🗑 全部消す</button>
+    <div class="sp"></div>
+    <button class="btn primary" id="gradeBtn" onclick="onGrade()">答え合わせ</button>
+  </div>
+  <div id="resBox"></div>
+</div>
+
+<!-- ===== RESULT ===== -->
+<div id="result" class="wrap hidden">
+  <header>
+    <h1 id="rTitle"></h1>
+    <div style="display:flex;gap:8px">
+      <button class="btn" onclick="retrySet()">このセットをもう一度</button>
+      <button class="btn primary" onclick="goHome()">ホームへ</button>
+    </div>
+  </header>
+  <div class="big" id="rScore"></div>
+  <div style="text-align:center;margin-bottom:14px;color:var(--sub)" id="rBest"></div>
+  <div id="rTrain"></div>
+  <table class="rv"><thead><tr><th></th><th>問題</th><th>あなたの答え</th><th>正解</th></tr></thead><tbody id="rBody"></tbody></table>
+</div>
+
+<!-- ===== EVAL ===== -->
+<div id="evalv" class="wrap hidden">
+  <header>
+    <h1 id="eTitle">今日の評価</h1>
+    <button class="btn" onclick="goHome()">ホームへ</button>
+  </header>
+  <table class="rv" id="eStats"></table>
+  <div id="eExtra"></div>
+  <div class="ebox">
+    <div class="ectl">
+      <button class="btn primary" onclick="speakEval()">▶ 音声で聞く</button>
+      <button class="btn" onclick="stopSpeak()">■ 止める</button>
+    </div>
+    <div id="eText" class="etext"></div>
+    <div id="eShare" class="ectl" style="margin-top:12px"></div>
+  </div>
+  <div id="eNext"></div>
+</div>
+
+<!-- ===== LOG ===== -->
+<div id="logv" class="wrap hidden">
+  <header>
+    <h1>学習の記録</h1>
+    <button class="btn" onclick="goHome()">ホームへ</button>
+  </header>
+  <div id="logBody"></div>
+</div>
+
+<!-- ===== SETTINGS ===== -->
+<div class="modal hidden" id="settings">
+  <div class="mbox">
+    <h3>設定</h3>
+    <label>Gemini APIキー（空欄なら自己採点モード）
+      <input type="password" id="sKey" placeholder="AIza..." autocomplete="off">
+    </label>
+    <label>書き起こし用モデル（漢字・英単語。正解を見せずに読む）
+      <input type="text" id="sModelRead" placeholder="gemini-flash-latest" list="modelList">
+    </label>
+    <label>判定用モデル（数式・用語。正解と見比べて判定）
+      <input type="text" id="sModelJudge" placeholder="gemini-flash-lite-latest" list="modelList">
+    </label>
+    <datalist id="modelList">
+      <option value="gemini-flash-latest">標準（Flash）</option>
+      <option value="gemini-flash-lite-latest">最安（Flash-Lite）</option>
+    </datalist>
+    <p>漢字・英単語は1文字違いも見逃さないよう、正解を見せずに書き起こし、プログラムで照合します。</p>
+    <div class="two">
+      <label>制限時間
+        <select id="sTime"><option value="0">なし</option><option value="70">短め（70%）</option><option value="85">やや短め（85%）</option><option value="100">標準</option><option value="120">やや長め（120%）</option><option value="150">長め（150%）</option></select>
+      </label>
+      <label>時間切れのとき
+        <select id="sTimeUp"><option value="stop">残りを×にして終了</option><option value="go">最後まで解く（超過を表示）</option></select>
+      </label>
+    </div>
+    <p>標準の制限時間（10問）：国語・英語・社会 3分／理科 3〜5分（計算が多い回は長め）／数学 5〜6分。AIの採点中と正解表示中は止まります。</p>
+    <label>正解したとき、次の問題へ自動で進むまで
+      <select id="sAuto"><option value="0">自動で進まない</option><option value="1">1秒</option><option value="1.5">1.5秒</option><option value="2">2秒</option><option value="3">3秒</option></select>
+    </label>
+    <div class="two">
+      <label>弱点トレーニング：書き取り
+        <select id="sWriteN"><option value="3">3回書く</option><option value="5">5回書く</option></select>
+      </label>
+      <label>弱点トレーニング：類題
+        <select id="sSimN"><option value="1">1問ずつ</option><option value="2">2問ずつ</option><option value="3">3問ずつ</option><option value="5">5問ずつ</option></select>
+      </label>
+    </div>
+    <p>漢字・英単語・用語をまちがえたら「見て覚える→見ないで書く」、数学・計算をまちがえたらAIが作る類題を解きます。</p>
+    <label>読み上げの声
+      <select id="sVoice"></select>
+    </label>
+    <div class="two">
+      <label>話す速さ<select id="sRate"><option value="0.9">ゆっくり</option><option value="1">ふつう</option><option value="1.1">少し速く</option></select></label>
+      <label>声の高さ<select id="sPitch"><option value="1">ふつう</option><option value="1.15">少し高め</option><option value="1.3">高め</option></select></label>
+    </div>
+    <div style="margin-top:8px"><button class="btn" onclick="testVoice()">▶ 声を試す</button></div>
+    <p>若い女性の自然な声（Nanami）は、Microsoft Edgeで開くと使えます。Chromeでは「Google 日本語」が女性の声です。</p>
+    <div class="chk"><input type="checkbox" id="sPen"><span>ペンのみで書く（手のひら・指のタッチを無視）</span></div>
+    <p>APIキーはこの端末のブラウザ内にだけ保存され、HTMLファイルには含まれません。</p>
+    <details style="margin-top:12px"><summary style="cursor:pointer;color:var(--sub);font-size:14px">上級者向け：スプレッドシートへの自動送信</summary>
+    <label>記録の送信先（Google Apps Script のウェブアプリURL）
+      <input type="text" id="sSync" placeholder="https://script.google.com/macros/s/..../exec">
+    </label>
+    <label>合言葉（同期に必須）
+      <input type="password" id="sSyncToken" placeholder="送信先と同じ合言葉">
+    </label>
+    <div style="margin-top:8px"><button class="btn" onclick="testSync()">📤 テスト送信</button></div>
+    <p>URLと合言葉を入れると、毎日の点数・時間・まちがえた単元・評価が保護者のスプレッドシートに自動で送られます（設定しなくても使えます）。</p>
+    </details>
+    <div class="acts">
+      <button class="btn" onclick="resetPlan()">今日の進み具合をリセット</button>
+      <button class="btn" onclick="resetScores()">成績をリセット</button>
+      <button class="btn" onclick="closeSettings()">閉じる</button>
+      <button class="btn primary" onclick="saveSettings()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script src="weeks.js"></script>
+<script src="shindan4.js"></script>
+<script src="nigate.js"></script>
+<script>
+/* ============================================================
+   問題データ
+   各問題：[問題文, 正解, 別解...]
+   rule：AI採点時の判定基準
+   ============================================================ */
+const SUBJECTS = [
+{ id:"kokugo", name:"国語", color:"var(--kokugo)", sets:[
+  { name:"漢字の読み", mode:"exact", hint:"ひらがな", rule:"ひらがなで答える問題。カタカナ・漢字での解答は不正解。送り仮名部分を含めて書いても、読みが正しければ正解。", qs:[
+    ["<em>穏やか</em>な海　（読みをひらがなで）","おだやか","おだ"],
+    ["交通が<em>滞る</em>　（読みをひらがなで）","とどこおる"],
+    ["音楽会を<em>催す</em>　（読みをひらがなで）","もよおす"],
+    ["損害を<em>償う</em>　（読みをひらがなで）","つぐなう"],
+    ["練習を<em>怠る</em>　（読みをひらがなで）","おこたる"],
+    ["力の<em>均衡</em>を保つ　（読みをひらがなで）","きんこう"],
+    ["教室の<em>雰囲気</em>　（読みをひらがなで）","ふんいき"],
+    ["自然の<em>恩恵</em>を受ける　（読みをひらがなで）","おんけい"],
+    ["<em>頻繁</em>に訪れる　（読みをひらがなで）","ひんぱん"],
+    ["<em>柔和</em>な表情　（読みをひらがなで）","にゅうわ"]
+  ]},
+  { name:"漢字の書き", mode:"exact", hint:"漢字（送り仮名があればひらがなも）", rule:"漢字で書く問題。ひらがなのままは不正解。送り仮名が必要な場合は送り仮名まで正しく書けていること。とめ・はね程度の乱れは許容するが、別の字に見える誤字は不正解。", qs:[
+    ["<em>ケワ</em>しい山道を登る　（カタカナを漢字に）","険"],
+    ["責任を<em>ハ</em>たす　（カタカナを漢字に）","果"],
+    ["<em>ユウビン</em>局に行く　（カタカナを漢字に）","郵便"],
+    ["<em>シュクフク</em>の言葉を贈る　（カタカナを漢字に）","祝福"],
+    ["<em>ドクソウ</em>的な作品　（カタカナを漢字に）","独創"],
+    ["<em>ケイカイ</em>を強める　（カタカナを漢字に）","警戒"],
+    ["荷物を<em>アズ</em>ける　（カタカナを漢字に）","預"],
+    ["<em>ジュンジョ</em>よく並ぶ　（カタカナを漢字に）","順序"],
+    ["新しい説を<em>トナ</em>える　（カタカナを漢字に）","唱"],
+    ["試合に<em>ノゾ</em>む　（カタカナを漢字に）","臨"]
+  ]},
+  { name:"漢字（読み・書き）", mode:"exact", hint:"漢字またはひらがな", rule:"「読み」と書かれた問題はひらがなで、「書き」と書かれた問題は漢字で答える。指定と違う文字種は不正解。", qs:[
+    ["【読み】社会に<em>貢献</em>する","こうけん"],
+    ["【読み】研究に<em>携わる</em>","たずさわる"],
+    ["【読み】花の香りが<em>漂う</em>","ただよう"],
+    ["【読み】<em>抑揚</em>をつけて読む","よくよう"],
+    ["【読み】判断を相手に<em>委ねる</em>","ゆだねる"],
+    ["【書き】列車が<em>ケイテキ</em>を鳴らす","警笛"],
+    ["【書き】野菜を<em>サイバイ</em>する","栽培"],
+    ["【書き】薬がよく<em>キ</em>く","効"],
+    ["【書き】布を青く<em>ソ</em>める","染"],
+    ["【書き】人口の<em>スイイ</em>を調べる","推移"]
+  ]},
+  { name:"四字熟語・ことわざ", mode:"exact", hint:"漢字1字", rule:"□に入る漢字1字を答える。ひらがなは不正解。", qs:[
+    ["「□刀直入」　□に入る漢字1字","単"],
+    ["「起死□生」　□に入る漢字1字","回"],
+    ["「異□同音」　□に入る漢字1字","口"],
+    ["「□心伝心」　□に入る漢字1字","以"],
+    ["「温故知□」　□に入る漢字1字","新"],
+    ["ことわざ「猫に□判」　□に入る漢字1字","小"],
+    ["慣用句「□を巻く」（ひどく感心する）　□に入る漢字1字","舌"],
+    ["ことわざ「馬の耳に□仏」　□に入る漢字1字","念"],
+    ["ことわざ「石の上にも□年」　□に入る漢字1字","三"],
+    ["故事成語「漁夫の□」　□に入る漢字1字","利"]
+  ]},
+  { name:"文法・敬語・文学史", rule:"語句で答える。漢字・ひらがなどちらでも意味が正しければ正解（人名は漢字が望ましいが、ひらがなでも読みが正しければ正解）。", qs:[
+    ["「美しい」の品詞名を答えなさい","形容詞"],
+    ["「静かだ」の品詞名を答えなさい","形容動詞"],
+    ["「<em>ゆっくり</em>歩く」の傍線部の品詞名","副詞"],
+    ["「行く」の尊敬語（特別な動詞）を答えなさい","いらっしゃる","おいでになる","行かれる"],
+    ["「見る」の謙譲語（特別な動詞）を答えなさい","拝見する","拝見"],
+    ["「言う」の謙譲語（特別な動詞）を答えなさい","申す","申し上げる"],
+    ["『走れメロス』の作者","太宰治"],
+    ["『坊っちゃん』の作者","夏目漱石"],
+    ["『枕草子』の作者","清少納言"],
+    ["歴史的仮名遣い「おもふ」を現代仮名遣いに","おもう"]
+  ]},
+  { name:"漢字（入試頻出）", mode:"exact", hint:"漢字またはひらがな", rule:"「読み」はひらがなで、「書き」は漢字で答える。指定と違う文字種は不正解。", qs:[
+    ["【読み】事態を<em>収拾</em>する","しゅうしゅう"],
+    ["【読み】<em>寡黙</em>な人","かもく"],
+    ["【読み】<em>示唆</em>に富む話","しさ"],
+    ["【読み】<em>漸く</em>春になった","ようやく"],
+    ["【読み】<em>僅か</em>な差で勝つ","わずか"],
+    ["【書き】<em>セイミツ</em>な機械","精密"],
+    ["【書き】対策を<em>ケントウ</em>する","検討"],
+    ["【書き】米の<em>シュウカク</em>","収穫"],
+    ["【書き】情報を<em>テイキョウ</em>する","提供"],
+    ["【書き】目標を<em>カカ</em>げる","掲"]
+  ]},
+  { name:"同音異義語・同訓異字", mode:"exact", hint:"漢字（送り仮名があればひらがなも）", rule:"文脈に合う漢字で書く。同じ読みの別の漢字は不正解。", qs:[
+    ["<em>イガイ</em>な結果に驚く　（カタカナを漢字に）","意外"],
+    ["関係者<em>イガイ</em>は立ち入り禁止　（カタカナを漢字に）","以外"],
+    ["<em>タイショウ</em>的な性格の二人　（カタカナを漢字に）","対照"],
+    ["中学生を<em>タイショウ</em>にした本　（カタカナを漢字に）","対象"],
+    ["左右<em>タイショウ</em>の図形　（カタカナを漢字に）","対称"],
+    ["<em>ツト</em>めて明るく振る舞う　（カタカナを漢字に）","努"],
+    ["銀行に<em>ツト</em>める　（カタカナを漢字に）","勤"],
+    ["議長を<em>ツト</em>める　（カタカナを漢字に）","務"],
+    ["駅までの時間を<em>ハカ</em>る　（カタカナを漢字に）","計"],
+    ["問題の解決を<em>ハカ</em>る　（カタカナを漢字に）","図"]
+  ]}
+]},
+{ id:"sugaku", name:"数学", color:"var(--sugaku)", sets:[
+  { name:"計算", rule:"数式として等価で、最も簡単な形になっていれば正解（項の順序・因数の順序は問わない）。約分や根号の簡略化が不十分なものは不正解。", qs:[
+    ["−3 ＋ 8 ×（−2） を計算しなさい","-19"],
+    ["（−2）³ − 4² を計算しなさい","-24"],
+    ["3(2x − 1) − 2(x − 4) を計算しなさい","4x+5"],
+    ["√48 − √12 を計算しなさい","2√3"],
+    ["(√3 ＋ 1)² を計算しなさい","4+2√3"],
+    ["6x²y ÷ 2xy × 3x を計算しなさい","9x²"],
+    ["(x ＋ 3)(x − 5) を展開しなさい","x²-2x-15"],
+    ["x² − 7x ＋ 12 を因数分解しなさい","(x-3)(x-4)"],
+    ["2x² − 8 を因数分解しなさい","2(x+2)(x-2)"],
+    ["12／√6 の分母を有理化しなさい","2√6"]
+  ]},
+  { name:"方程式", rule:"解がすべて正しければ正解。「x=」の有無は問わない。解が2つある問題は両方そろって正解。連立方程式は x と y の両方が正しいこと。", qs:[
+    ["方程式 3x − 7 ＝ 2x ＋ 5 を解きなさい","x=12"],
+    ["方程式 0.2x ＋ 1 ＝ 0.5x − 0.8 を解きなさい","x=6"],
+    ["連立方程式　x ＋ y ＝ 7、2x − y ＝ 5 を解きなさい","x=4, y=3"],
+    ["連立方程式　3x ＋ 2y ＝ 4、x − y ＝ 3 を解きなさい","x=2, y=-1"],
+    ["二次方程式 x² − 5x − 14 ＝ 0 を解きなさい","x=7, -2"],
+    ["二次方程式 x² ＝ 18 を解きなさい","x=±3√2"],
+    ["二次方程式 x² ＋ 4x − 1 ＝ 0 を解きなさい","x=-2±√5"],
+    ["二次方程式 (x − 3)² ＝ 5 を解きなさい","x=3±√5"],
+    ["二次方程式 x² − 6x ＝ 0 を解きなさい","x=0, 6"],
+    ["二次方程式 2x² − 3x − 1 ＝ 0 を解きなさい","x=(3±√17)/4"]
+  ]},
+  { name:"関数", rule:"式・値が数学的に等価なら正解。座標は (x, y) の両方が正しいこと。変域は不等号の向き・等号まで正しいこと。", qs:[
+    ["y は x に比例し、x ＝ 3 のとき y ＝ −12。y を x の式で表しなさい","y=-4x"],
+    ["y は x に反比例し、x ＝ 2 のとき y ＝ 6。x ＝ −3 のときの y の値","-4","y=-4"],
+    ["2点 (1, 3)、(3, 7) を通る直線の式","y=2x+1"],
+    ["直線 y ＝ 3x − 2 に平行で、点 (2, 1) を通る直線の式","y=3x-5"],
+    ["関数 y ＝ x² で、x が 1 から 3 まで増加するときの変化の割合","4"],
+    ["関数 y ＝ ax² のグラフが点 (2, −12) を通るとき、a の値","-3","a=-3"],
+    ["関数 y ＝ 2x² で、x の変域が −1 ≦ x ≦ 3 のときの y の変域","0≦y≦18"],
+    ["直線 y ＝ −x ＋ 6 と x 軸との交点の x 座標","6","x=6"],
+    ["2直線 y ＝ 2x − 1 と y ＝ −x ＋ 5 の交点の座標","(2, 3)"],
+    ["関数 y ＝ ½x² で、x ＝ −4 のときの y の値","8","y=8"]
+  ]},
+  { name:"図形", rule:"数値が正しければ正解。単位はなくても数値が正しければ正解とする。πを含む答えはπを使った形で正しいこと（3.14で近似したものは不正解）。", qs:[
+    ["正八角形の1つの内角の大きさ","135°","135"],
+    ["内角の和が 1440° になる多角形は何角形か","十角形","10角形"],
+    ["半径 6cm の円の面積","36π cm²","36π"],
+    ["半径 6cm、中心角 60° のおうぎ形の弧の長さ","2π cm","2π"],
+    ["直角をはさむ2辺が 5cm、12cm の直角三角形の斜辺の長さ","13cm","13"],
+    ["1辺 6cm の正三角形の高さ","3√3 cm","3√3"],
+    ["半径 3cm の球の体積","36π cm³","36π"],
+    ["底面の半径 4cm、高さ 6cm の円錐の体積","32π cm³","32π"],
+    ["相似比が 2：3 の2つの三角形の面積比","4:9"],
+    ["円で、弧ABに対する中心角が 110° のとき、弧ABに対する円周角の大きさ","55°","55"]
+  ]},
+  { name:"確率・データ・数の性質", rule:"数値が正しければ正解。確率は約分された分数であること（約分していないものは不正解）。単位・「通り」「個」の有無は問わない。", qs:[
+    ["大小2つのさいころを投げるとき、出る目の和が 7 になる確率","1/6"],
+    ["3枚の硬貨を同時に投げるとき、少なくとも1枚が表になる確率","7/8"],
+    ["1, 2, 3, 4 の4枚のカードから2枚を並べてできる2けたの整数は何通り","12通り","12"],
+    ["5人の中から2人の代表を選ぶ選び方は何通り","10通り","10"],
+    ["データ 3, 5, 7, 8, 10, 12 の中央値","7.5"],
+    ["データ 2, 4, 4, 5, 9 の範囲","7"],
+    ["√(12n) が自然数となる最小の自然数 n","3","n=3"],
+    ["3 ＜ √a ＜ 4 を満たす自然数 a は何個","6個","6"],
+    ["連続する3つの整数の和が 57 のとき、最も小さい整数","18"],
+    ["データ 1, 3, 4, 6, 7, 9, 10, 12 の第1四分位数","3.5"]
+  ]},
+  { name:"関数・図形の応用", rule:"式・値が数学的に等価で、最も簡単な形なら正解。単位の有無は問わない。根号・πを含む答えはその形で正しいこと。", qs:[
+    ["放物線 y ＝ x² 上の2点 A(−2, 4)、B(4, 16) を通る直線の式","y=2x+8"],
+    ["放物線 y ＝ x² 上の2点 A(−2, 4)、B(4, 16) と原点Oを結んだ △OAB の面積","24"],
+    ["関数 y ＝ ax² で、x が 2 から 4 まで増加するときの変化の割合が 12 のとき、a の値","2","a=2"],
+    ["1辺 4cm の立方体の対角線の長さ","4√3 cm","4√3"],
+    ["縦 6cm、横 8cm の長方形の対角線の長さ","10cm","10"],
+    ["半径 5cm の円で、中心からの距離が 3cm である弦の長さ","8cm","8"],
+    ["底面が1辺 6cm の正方形で、高さ 4cm の正四角錐の体積","48cm³","48"],
+    ["相似比が 2：3 の2つの円錐の体積比","8:27"],
+    ["三角形の3つの内角の比が 2：3：4 のとき、最も大きい角の大きさ","80°","80"],
+    ["平行四辺形ABCDで ∠A ＝ 110° のとき、∠B の大きさ","70°","70"]
+  ]},
+  { name:"確率・数・式の応用", rule:"数値・式が正しければ正解。確率は約分された分数であること。単位の有無は問わない。", qs:[
+    ["大小2つのさいころを投げるとき、出る目の積が 6 になる確率","1/9"],
+    ["赤玉3個・白玉2個が入った袋から同時に2個取り出すとき、2個とも赤玉である確率","3/10"],
+    ["大小2つのさいころを投げるとき、出る目の和が 10 以上になる確率","1/6"],
+    ["x ＝ √5 ＋ 2 のとき、x² − 4x ＋ 4 の値","5"],
+    ["x ＋ y ＝ 5、xy ＝ 3 のとき、x² ＋ y² の値","19"],
+    ["二次方程式 x² ＋ ax − 12 ＝ 0 の解の1つが 3 のとき、a の値","1","a=1"],
+    ["十の位と一の位の数の和が 9 の2けたの自然数がある。十の位と一の位を入れかえると、元の数より 27 大きくなる。元の数","36"],
+    ["定価 2000円 の品物を 15% 引きで買ったときの代金","1700円","1700"],
+    ["連続する2つの正の整数の積が 72 のとき、小さいほうの整数","8"],
+    ["√(45n) が自然数となる最小の自然数 n","5","n=5"]
+  ]}
+]},
+{ id:"eigo", name:"英語", color:"var(--eigo)", sets:[
+  { name:"英単語（日本語→英語）", mode:"exact", hint:"英単語", rule:"英単語のつづりが完全に正しければ正解。大文字・小文字の違いは問わない（曜日・月は頭文字が小文字でも正解とする）。1文字でもつづりが違えば不正解。", qs:[
+    ["「図書館」を英語で","library"],
+    ["「水曜日」を英語で","Wednesday"],
+    ["「2月」を英語で","February"],
+    ["「天気」を英語で","weather"],
+    ["「病院」を英語で","hospital"],
+    ["「経験」を英語で","experience"],
+    ["「環境」を英語で","environment"],
+    ["「重要な」を英語で","important"],
+    ["「違い」を英語で","difference"],
+    ["「理解する」を英語で","understand"]
+  ]},
+  { name:"語形変化", mode:"exact", hint:"英単語", rule:"指定された形の英単語のつづりが完全に正しければ正解。大文字・小文字は問わない。", qs:[
+    ["run の過去形","ran"],
+    ["write の過去分詞","written"],
+    ["buy の過去形","bought"],
+    ["big の比較級","bigger"],
+    ["good の最上級","best"],
+    ["child の複数形","children"],
+    ["swim の -ing形","swimming"],
+    ["teach の過去形","taught"],
+    ["knife の複数形","knives"],
+    ["speak の過去分詞","spoken"]
+  ]},
+  { name:"空所補充（1語）", mode:"exact", hint:"英単語", rule:"（　）に入る英単語1語のつづりが正しければ正解。大文字・小文字は問わない。", qs:[
+    ["I have lived here (　　) 2015.","since"],
+    ["She is good (　　) playing the piano.","at"],
+    ["This book was written (　　) Soseki.","by"],
+    ["I'm looking forward (　　) seeing you.","to"],
+    ["(　　) you ever been to Kyoto?","Have"],
+    ["If I (　　) a bird, I could fly to you.","were"],
+    ["He is the boy (　　) father is a doctor.","whose"],
+    ["Tom is taller (　　) Ken.","than"],
+    ["Please take care (　　) your dog.","of"],
+    ["I don't know what (　　) do.","to"]
+  ]},
+  { name:"書きかえ（1語）", mode:"exact", hint:"英単語", rule:"2文がほぼ同じ意味になるよう（　）に入る1語。つづりが正しければ正解。大文字・小文字は問わない。", qs:[
+    ["He can swim fast.<br>＝ He is able (　　) swim fast.","to"],
+    ["Let's play tennis.<br>＝ (　　) we play tennis?","Shall"],
+    ["I have no money.<br>＝ I don't have (　　) money.","any"],
+    ["Ken is older than Mike.<br>＝ Mike is (　　) than Ken.","younger"],
+    ["This is my bag.<br>＝ This bag is (　　).","mine"],
+    ["Be quiet in the library.<br>＝ You (　　) be quiet in the library.","must","should"],
+    ["He went to Tokyo, and he is not here now.<br>＝ He has (　　) to Tokyo.","gone"],
+    ["I was very busy, so I couldn't call you.<br>＝ I was (　　) busy to call you.","too"],
+    ["Do you know the girl who is singing a song?<br>＝ Do you know the girl (　　) a song?","singing"],
+    ["Look at the house which has a red roof.<br>＝ Look at the house (　　) a red roof.","with"]
+  ]},
+  { name:"定義・会話表現", mode:"exact", hint:"英単語", rule:"英単語1語のつづりが正しければ正解。大文字・小文字は問わない。", qs:[
+    ["the first month of the year","January"],
+    ["the day after Friday","Saturday"],
+    ["a person who teaches students at school","teacher"],
+    ["a room where people cook food","kitchen"],
+    ["the season between spring and fall","summer"],
+    ["A: How (　　) is this pen?　B: It's 200 yen.","much"],
+    ["A: (　　) is your birthday?　B: It's May 5.","When"],
+    ["A: Thank you very much.　B: You're (　　).","welcome"],
+    ["（受付で）May I (　　) your name, please?","have"],
+    ["A: (　　) don't we go shopping?　B: Sounds good.","Why"]
+  ]},
+  { name:"入試頻出語のつづり", mode:"exact", hint:"英単語", rule:"英単語のつづりが完全に正しければ正解。大文字・小文字は問わない。", qs:[
+    ["「建物」を英語で","building"],
+    ["「科学」を英語で","science"],
+    ["「辞書」を英語で","dictionary"],
+    ["「質問」を英語で","question"],
+    ["「交通」を英語で","traffic"],
+    ["「将来・未来」を英語で","future"],
+    ["「伝統的な」を英語で","traditional"],
+    ["「必要な」を英語で","necessary"],
+    ["「美しい」を英語で","beautiful"],
+    ["「決める」を英語で","decide"]
+  ]},
+  { name:"文法の応用（1語）", mode:"exact", hint:"英単語", rule:"（　）に入る英単語1語のつづりが正しければ正解。大文字・小文字は問わない。", qs:[
+    ["I want something cold (　　) drink.","to"],
+    ["The man (　　) is standing there is my uncle.","who","that"],
+    ["This is the book (　　) I bought yesterday.","which","that"],
+    ["Do you know (　　) he lives?（彼がどこに住んでいるか）","where"],
+    ["My mother told me (　　) clean my room.","to"],
+    ["English is (　　) in many countries.（speak を適切な形に）","spoken"],
+    ["I have (　　) finished my homework.（もう）","already"],
+    ["She has been sick (　　) three days.","for"],
+    ["I wish I (　　) speak French.","could"],
+    ["This is the (　　) interesting book of all.","most"]
+  ]}
+]},
+{ id:"shakai", name:"社会", color:"var(--shakai)", sets:[
+  { name:"日本の地理", rule:"用語が正しければ正解。漢字の軽い誤りは、別の語と誤解されない程度なら正解。ひらがな・カタカナでも語として正しければ正解。", qs:[
+    ["日本の最北端の島","択捉島","えとろふ島"],
+    ["香川県の県庁所在地","高松市","高松"],
+    ["日本で最も長い川","信濃川"],
+    ["降水量が少ない讃岐平野で、農業用水を確保するために多く造られたもの","ため池"],
+    ["東北地方の太平洋側に夏に吹く、冷たく湿った北東の風","やませ"],
+    ["2万5千分の1の地形図で、地図上 4cm の実際の距離","1km","1000m"],
+    ["工業製品出荷額が日本で最も多い工業地帯","中京工業地帯","中京"],
+    ["三陸海岸南部などに見られる、入り江と岬が入り組んだ海岸","リアス海岸","リアス式海岸"],
+    ["本州四国連絡橋のうち、香川県と岡山県を結ぶ橋","瀬戸大橋"],
+    ["日本の標準時子午線の経度","東経135度","135度"]
+  ]},
+  { name:"世界の地理", rule:"用語が正しければ正解。カタカナ語は多少の表記ゆれを許容。", qs:[
+    ["世界で最も面積が大きい大洋","太平洋"],
+    ["本初子午線が通る旧グリニッジ天文台がある都市","ロンドン"],
+    ["世界で最も長い川","ナイル川"],
+    ["EU（ヨーロッパ連合）の多くの国で使われている共通通貨","ユーロ"],
+    ["東南アジア諸国連合の略称（アルファベット）","ASEAN"],
+    ["アメリカ合衆国の北緯37度付近から南に広がる、工業が発達した地域","サンベルト"],
+    ["南アメリカ州で主にポルトガル語が話される国","ブラジル"],
+    ["中国が外国の資本や技術を導入するために沿岸部に設けた地域","経済特区"],
+    ["赤道付近に広がる、一年中気温が高く降水量が多い気候帯","熱帯"],
+    ["オーストラリアの先住民","アボリジニ","アボリジナルピープル"]
+  ]},
+  { name:"歴史（古代〜中世）", rule:"用語・人名が正しければ正解。人名・用語の漢字の軽い誤りは、別の語と誤解されない程度なら正解。", qs:[
+    ["3世紀、魏に使いを送った邪馬台国の女王","卑弥呼"],
+    ["聖徳太子が定めた、役人の心構えを示したきまり","十七条の憲法","十七条憲法"],
+    ["645年、中大兄皇子らが始めた政治改革","大化の改新"],
+    ["743年、新しく開墾した土地の永久私有を認めた法","墾田永年私財法"],
+    ["藤原氏が摂政・関白となって行った政治","摂関政治"],
+    ["1192年に征夷大将軍に任じられた人物","源頼朝"],
+    ["元寇のときの鎌倉幕府の執権","北条時宗"],
+    ["1232年、北条泰時が定めた武家の法","御成敗式目","貞永式目"],
+    ["金閣を建てた室町幕府3代将軍","足利義満"],
+    ["1467年に始まり、11年間続いた戦乱","応仁の乱"]
+  ]},
+  { name:"歴史（近世〜近代）", rule:"用語・人名が正しければ正解。漢字の軽い誤りは、別の語と誤解されない程度なら正解。", qs:[
+    ["織田信長が安土の城下で、市の税を免除し座の特権をなくした政策","楽市・楽座","楽市楽座"],
+    ["豊臣秀吉が全国の田畑の面積や収穫量を調べた政策","太閤検地"],
+    ["江戸幕府が大名を統制するために定めた法","武家諸法度"],
+    ["徳川家光が制度化した、大名が1年おきに江戸と領地を行き来する制度","参勤交代"],
+    ["8代将軍徳川吉宗が行った改革","享保の改革"],
+    ["1854年、江戸幕府がアメリカと結び、下田・函館を開いた条約","日米和親条約"],
+    ["1867年、徳川慶喜が政権を朝廷に返したこと","大政奉還"],
+    ["1873年、地価の3%を現金で納めさせることにした改革","地租改正"],
+    ["1889年に発布された、天皇が国民に与える形の憲法","大日本帝国憲法"],
+    ["1894年、朝鮮をめぐって日本と清との間で起こった戦争","日清戦争"]
+  ]},
+  { name:"公民", rule:"用語・数値が正しければ正解。カタカナ語の表記ゆれは許容。", qs:[
+    ["日本国憲法の三大原則のうち、国の政治のあり方を最終的に決める力が国民にあること","国民主権"],
+    ["衆議院議員の任期は何年","4年","4"],
+    ["日本国憲法で「国の唯一の立法機関」と定められている機関","国会"],
+    ["内閣が国会の信任にもとづいて成立し、国会に対して連帯責任を負うしくみ","議院内閣制"],
+    ["1つの事件について原則3回まで裁判を受けられる制度","三審制"],
+    ["住民が首長や議員の解職を求めること（カタカナで）","リコール"],
+    ["物価が継続的に上がり続ける現象","インフレーション","インフレ"],
+    ["日本の中央銀行","日本銀行","日銀"],
+    ["訪問販売などで、一定期間内なら無条件で契約を解除できる制度","クーリング・オフ","クーリングオフ"],
+    ["国連安全保障理事会の常任理事国が持つ、1国でも反対すると決定できない権利","拒否権"]
+  ]},
+  { name:"歴史（近代〜現代）", rule:"用語が正しければ正解。漢字の軽い誤りは、別の語と誤解されない程度なら正解。", qs:[
+    ["1904年、日本とロシアの間で起こった戦争","日露戦争"],
+    ["日露戦争の講和条約","ポーツマス条約"],
+    ["1910年、日本が韓国を植民地にしたこと","韓国併合"],
+    ["1918年、米の安売りを求めて全国に広がった騒動","米騒動"],
+    ["1925年に制定された、満25歳以上のすべての男子に選挙権を与えた法律","普通選挙法"],
+    ["1929年、ニューヨークの株価暴落から始まった世界的な不景気","世界恐慌"],
+    ["1931年、関東軍が南満州鉄道の線路を爆破したことから始まった出来事","満州事変"],
+    ["第二次世界大戦後、地主の土地を小作人に安く売り渡した改革","農地改革"],
+    ["1951年、日本が48か国と結んだ平和条約","サンフランシスコ平和条約"],
+    ["1950年代半ばから1970年代初めまで続いた、日本経済の急速な成長","高度経済成長"]
+  ]},
+  { name:"公民・地理の応用", rule:"用語が正しければ正解。漢字の軽い誤りや表記ゆれは、別の語と誤解されない程度なら正解。", qs:[
+    ["毎年1回、1月に召集され、主に予算を審議する国会","常会","通常国会"],
+    ["衆議院の総選挙の日から30日以内に召集される国会","特別会","特別国会"],
+    ["裁判官をやめさせるかどうかを判断するために、国会に設けられる裁判所","弾劾裁判所"],
+    ["最高裁判所の裁判官が適任かどうかを、国民が投票で判断する制度","国民審査"],
+    ["地方公共団体の間の財政の格差をおさえるために、国から配分されるお金","地方交付税交付金","地方交付税"],
+    ["消費税のように、税を納める人と負担する人が異なる税","間接税"],
+    ["所得が多い人ほど税率が高くなるしくみ","累進課税"],
+    ["企業が利潤を追求するだけでなく、社会に対して果たすべき責任","企業の社会的責任","CSR"],
+    ["香川県や岡山県などに見られる、1年を通して降水量が少ない気候","瀬戸内の気候"],
+    ["地球温暖化の原因となる、二酸化炭素などの気体","温室効果ガス"]
+  ]}
+]},
+{ id:"rika", name:"理科", color:"var(--rika)", sets:[
+  { name:"物理", rule:"用語・数値が正しければ正解。単位がなくても数値が正しければ正解。", qs:[
+    ["電圧 3V をかけると 0.5A の電流が流れる抵抗の大きさ","6Ω","6"],
+    ["100V の電圧で 2A の電流が流れる電気器具の電力","200W","200"],
+    ["物体に力がはたらかないとき、静止または等速直線運動を続ける性質","慣性"],
+    ["光が異なる物質の境界面で折れ曲がって進む現象","屈折"],
+    ["振動数を表す単位（カタカナまたは記号）","ヘルツ","Hz"],
+    ["質量 600g の物体にはたらく重力の大きさ（100gの物体にはたらく重力を1Nとする）","6N","6"],
+    ["1N の力で物体を力の向きに 2m 動かしたときの仕事","2J","2"],
+    ["コイルの中の磁界が変化すると、コイルに電流が流れる現象","電磁誘導"],
+    ["50N の力が 2m² の面に垂直にはたらくときの圧力","25Pa","25"],
+    ["位置エネルギーと運動エネルギーの和","力学的エネルギー"]
+  ]},
+  { name:"化学", rule:"用語・化学式・数値が正しければ正解。化学式は数字の位置（右下）まで正しいこと（H2O のように同じ大きさで書いても正解とする）。", qs:[
+    ["水を電気分解したとき、陰極に発生する気体","水素","H2"],
+    ["炭酸水素ナトリウムを加熱したときに発生する気体","二酸化炭素","CO2"],
+    ["物質が酸素と結びつく化学変化","酸化"],
+    ["酸化物から酸素がうばわれる化学変化","還元"],
+    ["塩化ナトリウムの化学式","NaCl"],
+    ["水の化学式","H₂O","H2O"],
+    ["酸性の水溶液に BTB 溶液を加えたときの色","黄色","黄"],
+    ["酸とアルカリが互いの性質を打ち消し合う反応","中和"],
+    ["水 100g に食塩 25g をとかした食塩水の質量パーセント濃度","20%","20"],
+    ["原子が電子を失ったり受け取ったりして電気を帯びたもの","イオン"]
+  ]},
+  { name:"生物", rule:"用語が正しければ正解。ひらがな・カタカナでも語として正しければ正解。", qs:[
+    ["植物の細胞で光合成が行われる部分","葉緑体"],
+    ["葉の表皮にある、2つの孔辺細胞に囲まれたすき間","気孔"],
+    ["遺伝子の本体である物質（アルファベット3文字）","DNA","デオキシリボ核酸"],
+    ["だ液に含まれ、デンプンを分解する消化酵素","アミラーゼ"],
+    ["血液の成分のうち、酸素を運ぶもの","赤血球"],
+    ["小腸の内側のひだの表面にある小さな突起","柔毛","じゅう毛"],
+    ["背骨をもつ動物のなかま","脊椎動物","セキツイ動物"],
+    ["被子植物のうち、子葉が1枚のなかま","単子葉類"],
+    ["刺激に対して無意識に起こる反応","反射"],
+    ["生殖細胞がつくられるときの、染色体の数が半分になる細胞分裂","減数分裂"]
+  ]},
+  { name:"地学", rule:"用語が正しければ正解。ひらがな・カタカナでも語として正しければ正解。", qs:[
+    ["地震そのものの規模（エネルギーの大きさ）を表す値","マグニチュード"],
+    ["ある地点での地震のゆれの程度","震度"],
+    ["火山灰などが堆積して固まってできた岩石","凝灰岩"],
+    ["マグマが地表や地表付近で急に冷えて固まった火成岩","火山岩"],
+    ["空気中の水蒸気が冷やされて水滴に変わり始めるときの温度","露点"],
+    ["寒冷前線が温暖前線に追いついてできる前線","閉塞前線"],
+    ["日本の冬に典型的な気圧配置","西高東低"],
+    ["太陽の表面に見える、周りより温度が低く黒く見える部分","黒点"],
+    ["地球が地軸を中心に1日に1回転すること","自転"],
+    ["夕方、西の空に見える金星の呼び名","よいの明星","宵の明星"]
+  ]},
+  { name:"計算・応用", rule:"数値・比が正しければ正解。単位がなくても数値が正しければ正解。比は最も簡単な整数比であること。", qs:[
+    ["10Ω と 20Ω の抵抗を直列につないだときの全体の抵抗","30Ω","30"],
+    ["6Ω と 3Ω の抵抗を並列につないだときの全体の抵抗","2Ω","2"],
+    ["物体が 4 秒間に 20m 進んだときの平均の速さ","5m/s","5"],
+    ["質量 54g、体積 20cm³ の物質の密度","2.7g/cm³","2.7"],
+    ["銅 0.8g を十分に加熱すると酸化銅が 1.0g できた。結びついた酸素の質量","0.2g","0.2"],
+    ["マグネシウムと酸素は 3：2 の質量比で結びつく。マグネシウム 1.2g と結びつく酸素の質量","0.8g","0.8"],
+    ["気温 20℃（飽和水蒸気量 17.3g/m³）の空気 1m³ に水蒸気が 8.65g 含まれているときの湿度","50%","50"],
+    ["P波の速さを 6km/s とすると、震源から 60km の地点に P波が届くまでの時間","10秒","10"],
+    ["60W の電球を 2 時間使ったときの電力量（Wh）","120Wh","120"],
+    ["丸の種子(AA)としわの種子(aa)をかけ合わせてできた子どうしをかけ合わせたとき、孫の丸：しわ の比","3:1"]
+  ]},
+  { name:"応用（物理・化学）", rule:"用語・数値が正しければ正解。単位がなくても数値が正しければ正解。", qs:[
+    ["2Ω と 3Ω の抵抗を直列につなぎ、10V の電圧をかけたときに流れる電流","2A","2"],
+    ["12Ω の電熱線に 6V の電圧をかけたときの電力","3W","3"],
+    ["200g の物体を 3m 持ち上げたときの仕事（100g の物体にはたらく重力を 1N とする）","6J","6"],
+    ["凸レンズの焦点距離の2倍の位置に物体を置いたとき、実像ができるのは焦点距離の何倍の位置か","2倍","焦点距離の2倍の位置"],
+    ["雷の光が見えてから 3 秒後に音が聞こえた。音の速さを 340m/s としたときの雷までの距離","1020m","1020"],
+    ["うすい塩酸に亜鉛を入れたときに発生する気体","水素","H2"],
+    ["酸化銅と炭素の混合物を加熱したとき、酸化銅が還元されてできる物質","銅","Cu"],
+    ["塩酸と水酸化ナトリウム水溶液を中和させたときにできる塩","塩化ナトリウム","NaCl"],
+    ["鉄と硫黄の混合物を加熱してできる物質","硫化鉄","FeS"],
+    ["質量パーセント濃度 20% の食塩水 150g に含まれる食塩の質量","30g","30"]
+  ]},
+  { name:"応用（生物・地学）", rule:"用語・数値が正しければ正解。単位がなくても数値が正しければ正解。ひらがな・カタカナでも語として正しければ正解。", qs:[
+    ["植物が根から吸収した水を、水蒸気として体の外に出すはたらき","蒸散"],
+    ["小腸の柔毛で吸収されたブドウ糖とアミノ酸が入る血管","毛細血管"],
+    ["肺で酸素と二酸化炭素の交換が行われる小さな袋","肺胞"],
+    ["受精を行わず、親の体の一部から新しい個体ができる生殖","無性生殖"],
+    ["生物の間の「食べる・食べられる」の関係のつながり","食物連鎖"],
+    ["震源から 72km の地点の初期微動継続時間が 9 秒のとき、震源から 120km の地点の初期微動継続時間","15秒","15"],
+    ["北の空の星が、北極星を中心に1時間に回転する角度","15°","15度"],
+    ["同じ時刻に見える星座の位置は、1か月でおよそ何度西へ移動するか","30°","30度"],
+    ["地層が堆積した時代を知る手がかりになる化石","示準化石"],
+    ["日本の夏に勢力が強くなる、太平洋上の高気圧","太平洋高気圧","小笠原高気圧"]
+  ]}
+]}
+];
+
+/* ============================================================
+   保存データ
+   ============================================================ */
+const STORE_KEY = "kijutsu250_v1";
+let store = { key:"", modelRead:"gemini-flash-latest", modelJudge:"gemini-flash-lite-latest", penOnly:false, best:{},
+  timeScale:100, timeUp:"stop", autoNext:1.5, writeN:3, simN:2, voice:"", rate:1.0, pitch:1.15,
+  days:{},    // 日ごとのメニューの進み具合 { "YYYY-MM-DD": { done:{教科:点}, warm, evald, review, weekEval, weekReview } }
+  qstat:{},   // 問題ごとの最新成績 {n:回数, w:まちがい回数, ok:直近の正誤（記述のみ）, last:日付}
+  hist:{},    // 日ごとの記録（評価・週の比較・記録ページ・スプレッドシート送信に使う）
+  att:[] };   // 解答履歴 [日付, 問題キー, 正誤1/0, 種類 t=本番 w=ウォームアップ r=補強記述 k=週末補強 c=4択]
+function load(){ try{ const s = JSON.parse(localStorage.getItem(STORE_KEY)||"null"); if(s) store = Object.assign(store,s); }catch(e){} }
+function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){} }
+load();
+if(!store.days) store.days = {};
+if(!window.WEEKS) window.WEEKS = {}; if(!window.EVENTS) window.EVENTS = []; if(!window.SPECIAL) window.SPECIAL = {}; if(!window.NIGATE) window.NIGATE = {};
+
+/* 日付ユーティリティ（端末の日本時間で扱う） */
+function fmtDate(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function parseDate(s){ const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); }
+function addDays(s,n){ const d = parseDate(s); d.setDate(d.getDate()+n); return fmtDate(d); }
+function todayStr(){ return window.__TODAY__ || fmtDate(new Date()); }
+function mondayOf(s){ const d = parseDate(s); d.setDate(d.getDate()-((d.getDay()+6)%7)); return fmtDate(d); }
+function mdLabel(s){ const d = parseDate(s); return `${d.getMonth()+1}/${d.getDate()}`; }
+function weekLabel(mon){ return `${mdLabel(mon)}〜${mdLabel(addDays(mon,6))}の週`; }
+const WD = "日月火水木金土";
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+/* ============================================================
+   問題セット：基本セット（第1〜7回）＋ 週ごとの問題（weeks.js）
+   セットID：基本は 0〜6 の数字、週ごとは "w20261019d1" のような文字列
+   ============================================================ */
+function weekSetId(mon,k){ return "w"+mon.replace(/-/g,"")+"d"+(k+1); }
+function spSetId(d,k){ return "x"+d.replace(/-/g,"")+"n"+(k+1); }
+function getSet(si, id){
+  if(typeof id==="number" || /^\d+$/.test(id)) return SUBJECTS[si].sets[+id];
+  const ng = String(id).match(/^n(\d+)$/);
+  if(ng){ const L = NIGATE[SUBJECTS[si].id]; return L ? L[+ng[1]] : null; }
+  const sp = String(id).match(/^x(\d{4})(\d{2})(\d{2})n(\d+)$/);
+  if(sp){ const d = SPECIAL[`${sp[1]}-${sp[2]}-${sp[3]}`]; return d && d.subjects[SUBJECTS[si].id] ? d.subjects[SUBJECTS[si].id][+sp[4]-1] : null; }
+  const m = String(id).match(/^w(\d{4})(\d{2})(\d{2})d(\d)$/); if(!m) return null;
+  const wk = WEEKS[`${m[1]}-${m[2]}-${m[3]}`];
+  return wk && wk.subjects[SUBJECTS[si].id] ? wk.subjects[SUBJECTS[si].id][+m[4]-1] : null;
+}
+/* その教科で今日までに使える全セット（未来の週は出さない） */
+function allSetsOf(si){
+  const out = SUBJECTS[si].sets.map((st,i)=>({ id:i, st }));
+  const thisMon = mondayOf(todayStr());
+  Object.keys(WEEKS).sort().forEach(mon=>{
+    if(mon > thisMon) return;
+    (WEEKS[mon].subjects[SUBJECTS[si].id]||[]).forEach((st,k)=>out.push({ id:weekSetId(mon,k), st }));
+  });
+  /* 苦手の基礎・応用（nigate.js）：from の日から */
+  (NIGATE[SUBJECTS[si].id]||[]).forEach((st,k)=>{ if(!st.from || st.from<=todayStr()) out.push({ id:"n"+k, st }); });
+  /* 特別メニュー（診断対策など）は、その日になったら「今日の10問」・補強にも使う */
+  Object.keys(SPECIAL).sort().forEach(d=>{
+    if(d > todayStr()) return;
+    (SPECIAL[d].subjects[SUBJECTS[si].id]||[]).forEach((st,k)=>out.push({ id:spSetId(d,k), st }));
+  });
+  return out;
+}
+function makeItems(si, id){
+  const st = getSet(si,id), sid = SUBJECTS[si].id;
+  return st.qs.map((q,qi)=>({ si, set:id, qi, q, st, key:`${sid}-${id}-${qi}` }));
+}
+function itemFromKey(key){
+  const [sid,set,qi] = key.split("-"), si = SUBJECTS.findIndex(s=>s.id===sid);
+  if(si<0) return null;
+  const id = /^\d+$/.test(set) ? +set : set, st = getSet(si,id);
+  return st && st.qs[+qi] ? { si, set:id, qi:+qi, q:st.qs[+qi], st, key } : null;
+}
+/* まだ習っていない単元の問題は、習う予定の週まで「今日の10問」・ウォームアップ・補強に出さない
+   （日付＝出し始める日。"9999"＝習った時期がわかるまで出さない） */
+const NOT_YET = {
+  // 理科 天体（地球と宇宙）：11月末から授業 → 習ったあとの12/14の週から
+  "rika-3-7":"2026-12-14", "rika-3-8":"2026-12-14", "rika-3-9":"2026-12-14", "rika-6-6":"2026-12-14", "rika-6-7":"2026-12-14",
+  // 社会 司法・地方自治：11/30の週から
+  "shakai-4-4":"2026-11-30", "shakai-4-5":"2026-11-30", "shakai-6-2":"2026-11-30", "shakai-6-3":"2026-11-30", "shakai-6-4":"2026-11-30",
+  // 社会 経済：12/7の週から
+  "shakai-4-6":"2026-12-07", "shakai-4-7":"2026-12-07", "shakai-4-8":"2026-12-07", "shakai-6-5":"2026-12-07", "shakai-6-6":"2026-12-07", "shakai-6-7":"2026-12-07",
+  // 社会 国際社会（国際連合）：未習
+  "shakai-4-9":"9999"
+};
+function isOpen(key){ const d = NOT_YET[key]; return !d || todayStr() >= d; }
+function openItem(it){ return !!it && isOpen(it.key); }
+function unitLabel(it){ return typeof it.set==="number" ? `第${it.set+1}回 ${it.st.name}` : it.st.name; }
+function studyNo(date){ return Object.keys(store.hist).filter(d=>d<date && Object.keys(store.hist[d].subj||{}).length).length + 1; }
+function histToday(){ const t=todayStr(); return store.hist[t] = store.hist[t] || { day:studyNo(t), subj:{} }; }
+function logAtt(key, ok, kind){ store.att.push([todayStr(), key, ok?1:0, kind]); }
+
+/* ============================================================
+   制限時間（10問あたりの標準秒数）
+   ============================================================ */
+function baseTime(si,id){
+  const sid = SUBJECTS[si].id;
+  if(typeof id!=="number"){ const st = getSet(si,id); if(st && st.time) return st.time; return sid==="sugaku"?330 : sid==="rika"?210 : 180; }
+  if(sid==="sugaku") return [300,360,300,300,300,360,360][id]||300;
+  if(sid==="rika")   return (id===4||id===5) ? 300 : (id===6 ? 240 : 180);
+  return 180;
+}
+function itemsLimit(items){
+  if(!(store.timeScale>0) || items.every(it=>it.mc)) return 0;
+  const base = items.reduce((t,it)=>t + baseTime(it.si,it.set)/10, 0);
+  return Math.round(base*store.timeScale/100);
+}
+function fmt(sec){ const neg = sec<0; sec = Math.abs(Math.ceil(sec)); return (neg?"−":"")+Math.floor(sec/60)+":"+String(sec%60).padStart(2,"0"); }
+
+/* ============================================================
+   今日のメニュー（曜日と予定表で決まる）
+   月〜金：その週の新しい問題（weeks.js）／土：今日の10問（苦手優先）／日：1週間の振り返り
+   予定表 off＝お休み、light＝記述10問の軽い総復習（4択は使わない：2026/11/10〜）
+   平日・土：① ウォームアップ ② 5教科 ③ 今日の評価 ④ 弱点補強2回目
+   日　　　：① 1週間の評価 ② 週末の弱点補強
+   ============================================================ */
+function eventOn(d){ return EVENTS.find(e=>e.date===d); }
+function todayPlan(d){
+  d = d || todayStr();
+  const ev = eventOn(d), wd = parseDate(d).getDay(), mon = mondayOf(d), wk = WEEKS[mon];
+  if(SPECIAL[d]) return { type:"special", sp:SPECIAL[d], d, ev, mon, wk };
+  if(ev && ev.mode==="off")   return { type:"off", ev, mon, wk };
+  if(ev && ev.mode==="light") return { type:"light", ev, mon, wk };
+  if(wd===0) return { type:"sun", mon, wk };
+  if(wd===6) return { type:"sat", mon, wk };
+  return { type:"week", mon, wk, idx:wd-1 };
+}
+/* その日の各教科のメニュー */
+function subjMenu(si, plan){
+  const sid = SUBJECTS[si].id;
+  if(plan.type==="light") return { kind:"mix", light:true, name:"軽めの総復習（10問）" };
+  if(plan.type==="special"){
+    const sets = plan.sp.subjects[sid]||[], got = (planState().sp||{})[sid]||{};
+    const k = sets.findIndex((_,i)=>got[i]==null);
+    if(!sets.length) return { kind:"mix", name:"今日の10問" };
+    if(k<0) return { kind:"spdone", n:sets.length, name:"全部終わり" };
+    return { kind:"day", id:spSetId(plan.d,k), k, n:sets.length, name:`${k+1}/${sets.length}セット目：${sets[k].name}` };
+  }
+  if(plan.type==="week" && plan.wk && plan.wk.subjects[sid] && plan.wk.subjects[sid][plan.idx])
+    return { kind:"day", id:weekSetId(plan.mon, plan.idx), name:plan.wk.subjects[sid][plan.idx].name };
+  return { kind:"mix", name:"今日の10問" };
+}
+function planState(){ const t = todayStr(); return store.days[t] = store.days[t] || { done:{} }; }
+function allSubjDone(p){ return SUBJECTS.every(s=>p.done[s.id]!=null); }
+function nextBigEvent(){
+  const t = todayStr();
+  return EVENTS.filter(e=>e.big && e.date>=t).sort((a,b)=>a.date.localeCompare(b.date))[0];
+}
+function daysUntil(d){ return Math.round((parseDate(d)-parseDate(todayStr()))/86400000); }
+/* 前日までにまちがえて、まだ記述で正解していない問題（新しい順に最大10問） */
+function warmCandidates(){
+  const t = todayStr();
+  return Object.entries(store.qstat).filter(([k,v])=>v.ok===false && v.last<t)
+    .filter(([k])=>isOpen(k)).sort((a,b)=>b[1].last.localeCompare(a[1].last)).slice(0,10)
+    .map(([k])=>itemFromKey(k)).filter(Boolean);
+}
+/* 今日の本番でまちがえた問題 */
+function todayWrongItems(){
+  const h = store.hist[todayStr()]; if(!h) return [];
+  return Object.values(h.subj).flatMap(x=>x.wrong||[]).map(itemFromKey).filter(openItem);
+}
+function renderToday(){
+  const t = todayStr(), plan = todayPlan(t), p = planState(), h = store.hist[t];
+  const d = parseDate(t), head = `${d.getMonth()+1}/${d.getDate()}（${WD[d.getDay()]}）`;
+  const nb = nextBigEvent();
+  const countdown = nb ? `<span class="cd">${nb.label}まで <b>${daysUntil(nb.date)===0?"今日":"あと"+daysUntil(nb.date)+"日"}</b></span>` : "";
+  const step = (n,lb,sub,body,fin,curn)=>`<div class="step${curn===n?" cur":""}${fin?" fin":""}"><span class="no">${"①②③④⑤⑥"[n-1]}</span><span class="lb">${lb}<small>${sub}</small></span>${body}</div>`;
+  let sub, steps="", tsum="";
+  // 日曜日でも今週の記録がまだないときは、土曜日と同じく5教科の「今日の10問」を出す
+  if(plan.type==="sun" && !weekDatesOf(plan.mon).length) plan.type = "sunfree";
+
+  if(plan.type==="off"){
+    sub = `今日は「${plan.ev.label}」`;
+    steps = `<div class="step cur"><span class="lb">今日のメニューはお休み<small>これまでの成果を出し切ろう。がんばってね！</small></span></div>`;
+  } else if(plan.type==="sun"){
+    sub = `日曜日：1週間の振り返り（${weekLabel(plan.mon)}）`;
+    const hasWeek = weekDatesOf(plan.mon).length>0;
+    const s1 = hasWeek ? `<button class="btn ${p.weekEval?"":"primary"}" onclick="openWeekEval()">${p.weekEval?"もう一度聞く":"1週間の評価を聞く 🔊"}</button>` : `<span class="st">今週の記録がまだありません</span>`;
+    const s2 = p.weekReview ? `<span class="st">✓ ${h&&h.week?`${h.week.w[1]+h.week.c[1]}/${h.week.w[0]+h.week.c[0]}問`:"完了"}</span>`
+      : (p.weekEval||!hasWeek) ? `<button class="btn primary" onclick="startWeekReview()">週末の弱点補強へ →</button>` : `<span class="st">週の評価のあとに行います</span>`;
+    const curn = hasWeek && !p.weekEval ? 1 : !p.weekReview ? 2 : 0;
+    const s3 = `<div class="tlist">${SUBJECTS.map((s,si)=>{ const sc = p.done[s.id];
+        return `<button class="tbtn${sc!=null?" done":""}" style="--c:${s.color}" onclick="startDaily(${si})">${s.name}<small>${sc!=null?`✓ ${sc}/10`:"今日の15問"}</small></button>`; }).join("")}</div>`;
+    steps = step(1,"1週間の評価","先週と比較・音声で2〜3分",s1,!!p.weekEval,curn) + step(2,"週末の弱点補強","約30分（すべて記述）",s2,!!p.weekReview,curn)
+          + step(3,"もっと解きたいとき","自由：5教科の今日の10問",s3,false,0);
+    if(p.weekReview) tsum = "🎉 1週間のメニュー完了！おつかれさま。来週もいっしょにがんばろうね。";
+  } else {
+    const done5 = allSubjDone(p), light = plan.type==="light";
+    const special = plan.type==="special";
+    sub = special ? `${plan.sp.label}：${plan.sp.note}`
+        : light ? `今日は「${plan.ev.label}」：記述10問で軽く総復習` : plan.type==="sat" ? "土曜日：今日の10問（苦手優先＋全範囲から）"
+        : plan.type==="sunfree" ? "日曜日：今週の記録がまだないので、今日は5教科の「今日の10問」を解こう（新しい週の問題は月曜から）"
+        : plan.wk ? `${weekLabel(plan.mon)}：厚物と同じ範囲の新しい問題` : "今日の10問（全範囲から）";
+    if(plan.ev && (!plan.ev.mode || special)) sub += `　／　今日は${plan.ev.label}`;
+    const warmN = light ? 0 : warmCandidates().length;
+    let s1;
+    if(light) s1 = `<span class="st">今日はとばします</span>`;
+    else if(p.warm) s1 = `<span class="st">✓ ${h&&h.warm?`${h.warm.ok}/${h.warm.n}問 正解`:"完了"}</span>`;
+    else if(warmN) s1 = `<button class="btn primary" onclick="startWarm()">前日までの弱点 ${warmN}問 →</button><button class="btn" onclick="skipWarm()">今日はとばす</button>`;
+    else s1 = `<span class="st">前日までの弱点はありません</span>`;
+    const s2 = `<div class="tlist">${SUBJECTS.map((s,si)=>{
+        const sc = p.done[s.id], m = subjMenu(si, plan);
+        if(special){
+          const x = h && h.subj[s.id] && h.subj[s.id].raw;
+          const lb = m.kind==="spdone" ? `✓ ${m.n}セット完了（${x?x[0]+"/"+x[1]:""}）` : `${esc(m.name)}${x?`<br>ここまで ${x[0]}/${x[1]}`:""}`;
+          return `<button class="tbtn${m.kind==="spdone"?" done":""}" style="--c:${s.color}" onclick="startDaily(${si})">${s.name}<small>${lb}</small></button>`;
+        }
+        return `<button class="tbtn${sc!=null?" done":""}" style="--c:${s.color}" onclick="startDaily(${si})">${s.name}<small>${sc!=null?`✓ ${sc}/10`:esc(m.name)}</small></button>`;
+      }).join("")}</div>`;
+    const s3 = done5 ? `<button class="btn ${p.evald?"":"primary"}" onclick="openEval()">${p.evald?"もう一度聞く":"今日の評価を聞く 🔊"}</button>` : `<span class="st">5教科が終わったら聞けます</span>`;
+    let s4;
+    if(light) s4 = `<span class="st">今日はありません</span>`;
+    else if(p.review) s4 = `<span class="st">✓ ${h&&h.review?`${h.review.w[1]+h.review.c[1]}/${h.review.w[0]+h.review.c[0]}問`:"完了"}</span>`;
+    else if(done5) s4 = `<button class="btn ${p.evald?"primary":""}" onclick="startReview()">今日まちがえた問題をもう一度 →</button>`;
+    else s4 = `<span class="st">評価のあとに行います</span>`;
+    const curn = !light && !p.warm && warmN ? 1 : !done5 ? 2 : !p.evald ? 3 : (!light && !p.review) ? 4 : 0;
+    steps = step(1,"ウォームアップ","5〜10分",s1,light||p.warm||!warmN,curn) + step(2,special?"5教科のセットを順番に":light?"5教科×10問":"5教科×15問",special?`全${SUBJECTS.reduce((t,x)=>t+((plan.sp.subjects[x.id]||[]).length),0)}セット・1セット約6〜8分（教科を交互にすると集中が続く）`:light?"記述で15分":"10問分の時間で15問（数国社は＋苦手5問）",s2,done5,curn)
+          + step(3,"今日の評価","音声で1〜2分",s3,!!p.evald,curn) + step(4,"弱点補強2回目","10〜15分（すべて記述）",s4,light||!!p.review,curn);
+    const sum = SUBJECTS.reduce((a,s)=>a+(p.done[s.id]||0),0);
+    if(special){
+      const raw = SUBJECTS.reduce((a,s)=>{ const x = h && h.subj[s.id] && h.subj[s.id].raw; return x ? [a[0]+x[0], a[1]+x[1]] : a; },[0,0]);
+      tsum = `${done5 && p.review?"🎉 今日のメニュー完了！お疲れさま。　":""}今日の正解 <b>${raw[0]}</b> / ${raw[1]}問${raw[1]?`（${Math.round(raw[0]/raw[1]*100)}%）`:""}`;
+    } else
+    tsum = `${done5 && (light||p.review)?"🎉 今日のメニュー完了！お疲れさま。　":""}今日の合計 <b>${sum}</b> / 50点`;
+  }
+  document.getElementById("today").innerHTML = `<div class="today">
+    <div class="th"><b>今日のメニュー　${head}</b>${countdown}</div>
+    <div class="tsub">${sub}</div>
+    <div class="steps">${steps}</div>
+    ${tsum?`<div class="tsum">${tsum}</div>`:""}
+  </div>`;
+}
+function skipWarm(){ planState().warm="skip"; save(); renderHome(); }
+function startDaily(si){
+  const p = planState(), plan = todayPlan(), sid = SUBJECTS[si].id;
+  if(plan.type==="special"){
+    const m = subjMenu(si, plan);
+    if(m.kind==="day") return startSession({ kind:"day", si, set:m.id, items:makeItems(si, m.id), daily:true, sp:m.k });
+    if(m.kind==="spdone"){ if(confirm("この教科は今日のセットが全部終わりました。おかわりで「今日の10問」を解きますか？（記録には入りません）")) startSession({ kind:"mix", si, set:-1, items:pickMix(si), daily:false }); return; }
+  }
+  if(p.done[sid]!=null && !confirm("今日はもう解きました。もう一度解きますか？（記録は最初の点数のままです）")) return;
+  const daily = p.done[sid]==null, m = subjMenu(si, plan);
+  if(m.light) return startSession({ kind:"mix", si, set:-1, items:pickMix(si), daily, light:true });
+  const base = m.kind==="day" ? makeItems(si, m.id) : pickMix(si);
+  /* 15問：その日の10問＋苦手5問（数学・国語・社会）／復習5問（英語・理科）。制限時間は10問分のまま */
+  const items = base.concat(extraFive(si, base));
+  startSession({ kind:m.kind==="day"?"day":"mix", si, set:m.kind==="day"?m.id:-1, items, daily, limit:itemsLimit(base), plus:true });
+}
+/* 毎日の15問のうち、追加の5問 */
+const EXTRA_N = 5;
+function extraFive(si, base){
+  const p = planState(), sid = SUBJECTS[si].id; p.ex = p.ex||{};
+  if(p.ex[sid]){ const kept = p.ex[sid].map(itemFromKey).filter(openItem); if(kept.length) return kept; }
+  const out = NIGATE[sid] ? pickNigate(si) : pickMix(si).filter(it=>!base.some(b=>b.key===it.key)).slice(0, EXTRA_N);
+  p.ex[sid] = out.map(it=>it.key); save();
+  return out;
+}
+/* 苦手5問：基礎3問＋応用2問。まちがえた問題 → まだ解いていない問題（単元を順番に）→ しばらく解いていない問題 */
+function pickNigate(si){
+  const sid = SUBJECTS[si].id, stat = k => store.qstat[k] || { n:0, ok:null, last:"" };
+  const sets = (NIGATE[sid]||[]).map((st,k)=>({ st, k })).filter(x=>!x.st.from || x.st.from<=todayStr());
+  const pick = (list, n)=>{
+    const items = list.flatMap(({st,k})=>st.qs.map((q,qi)=>({ si, set:"n"+k, qi, q, st, key:`${sid}-n${k}-${qi}` })));
+    const wrong = items.filter(it=>stat(it.key).ok===false).sort((a,b)=>(stat(a.key).last||"").localeCompare(stat(b.key).last||""));
+    const fresh = items.filter(it=>stat(it.key).n===0).sort((a,b)=>a.qi-b.qi || a.set.localeCompare(b.set));
+    const old = items.filter(it=>stat(it.key).n>0 && stat(it.key).ok!==false).sort((a,b)=>(stat(a.key).last||"").localeCompare(stat(b.key).last||""));
+    const out = []; [wrong.slice(0, Math.ceil(n/2)), fresh, old, wrong].forEach(g=>g.forEach(it=>{ if(out.length<n && !out.includes(it)) out.push(it); }));
+    return out;
+  };
+  const basic = sets.filter(x=>!x.st.lv), adv = sets.filter(x=>x.st.lv);
+  const nAdv = adv.length ? 2 : 0;
+  return pick(basic, EXTRA_N-nAdv).concat(pick(adv, nAdv));
+}
+/* 今日の10問：直近でまちがえた問題を最大6問＋しばらく解いていない問題 */
+function pickMix(si){
+  const all = [], sid = SUBJECTS[si].id;
+  allSetsOf(si).forEach(({id,st})=>st.qs.forEach((q,qi)=>{ const key = `${sid}-${id}-${qi}`; if(isOpen(key)) all.push({ si, set:id, qi, q, st, key }); }));
+  const stat = k => store.qstat[k] || { n:0, ok:null, last:"" };
+  const weak = shuffle(all.filter(x=>stat(x.key).ok===false)).slice(0,6);
+  const rest = shuffle(all.filter(x=>!weak.includes(x)))
+    .sort((a,b)=> (stat(a.key).last||"").localeCompare(stat(b.key).last||"") || stat(a.key).n-stat(b.key).n);
+  return shuffle(weak.concat(rest.slice(0, 10-weak.length)));
+}
+function startWarm(){
+  const items = warmCandidates();
+  if(!items.length){ skipWarm(); return; }
+  startSession({ kind:"warm", si:-1, set:-1, items, daily:true });
+}
+/* 補強2回目：すべて記述（今日まちがえた問題＋前からの苦手を少し。最大15問） */
+function startReview(){
+  const wrong = shuffle(todayWrongItems());
+  if(!wrong.length){
+    planState().review = "done"; histToday().review = { w:[0,0], c:[0,0] }; save(); syncDay();
+    alert("今日は全問正解！ 補強はありません。お疲れさま。"); renderHome(); return;
+  }
+  const written = wrong.slice(0,12);
+  const others = Object.entries(store.qstat).filter(([k,v])=>v.ok===false).map(([k])=>itemFromKey(k)).filter(openItem);
+  const pool = [...wrong]; others.forEach(x=>{ if(!pool.some(y=>y.key===x.key)) pool.push(x); });
+  const more = shuffle(pool.filter(x=>!written.some(y=>y.key===x.key))).slice(0, 15-written.length);
+  startSession({ kind:"review", si:-1, set:-1, items:written.concat(more), daily:true });
+}
+
+/* ============================================================
+   ホーム
+   ============================================================ */
+function renderHome(){
+  renderToday();
+  const g = document.getElementById("subjGrid"); g.innerHTML = "";
+  let grand = 0;
+  SUBJECTS.forEach((s,si)=>{
+    const b = store.best[s.id]||{};
+    let sum = 0; s.sets.forEach((_,i)=>{ if(b[i]!=null) sum+=b[i]; });
+    grand += sum;
+    const d = document.createElement("div"); d.className="subj"; d.style.setProperty("--c",s.color);
+    d.innerHTML = `<h2>${s.name}<span><b>${sum}</b> / ${s.sets.length*10}点</span></h2><div class="sets"></div>`;
+    const sets = d.querySelector(".sets");
+    s.sets.forEach((st,i)=>{
+      const sc = b[i], lim = Math.round(baseTime(si,i)*store.timeScale/100);
+      const bt = document.createElement("button");
+      bt.className = "setbtn"+(sc!=null?" done":"");
+      bt.innerHTML = `第${i+1}回<small>${st.name}</small><span class="sc">${sc!=null?sc+"/10":"—"}</span>${lim?`<small>⏱${fmt(lim)}</small>`:""}`;
+      bt.onclick = ()=>startSet(si,i,false);
+      sets.appendChild(bt);
+    });
+    g.appendChild(d);
+  });
+  document.getElementById("grand").textContent = grand;
+  document.getElementById("modeNote").innerHTML = store.key
+    ? "採点モード：<b>AI採点</b>（手書きをAIが読み取って判定。誤読のときは判定を修正できます）"
+    : "採点モード：<b>自己採点</b>（⚙設定でGemini APIキーを入れるとAI採点になります）";
+}
+
+/* ============================================================
+   画面・状態
+   cur.kind：set＝基本セット第◯回／day＝その週の新しい問題／mix＝今日の10問・総復習
+            warm＝ウォームアップ／review＝弱点補強2回目／week＝週末の弱点補強
+   ============================================================ */
+let cur = null;
+function show(id){ stopSpeak(); ["home","quiz","result","evalv","logv"].forEach(x=>document.getElementById(x).classList.toggle("hidden",x!==id)); }
+function curSubj(){ return SUBJECTS[cur.subj]; }
+function isMulti(){ return cur.kind==="warm" || cur.kind==="review" || cur.kind==="week"; }
+
+function startSet(si,i,daily){ startSession({ kind:"set", si, set:i, items:makeItems(si,i), daily }); }
+function startSession(o){
+  cancelAuto();
+  cur = { mode:"test", kind:o.kind, subj:o.si, set:o.set, items:o.items, idx:0, answers:[], daily:!!o.daily, light:!!o.light, sp:(o.sp==null?null:o.sp), t0:Date.now() };
+  cur.plus = !!o.plus;
+  /* ウォームアップ・補強も制限時間つき（時間の意識を持たせる：2026/11/10〜） */
+  timerReset(o.limit!=null ? o.limit : itemsLimit(o.items));
+  const color = o.si>=0 ? SUBJECTS[o.si].color : "var(--accent)";
+  document.getElementById("quiz").style.setProperty("--c",color);
+  document.getElementById("result").style.setProperty("--c",color);
+  if(o.si>=0) document.getElementById("qTag").textContent = SUBJECTS[o.si].name;
+  show("quiz"); setPadRows(0); renderQ();
+}
+function retrySet(){ startSession({ kind:cur.kind, si:cur.subj, set:cur.set, items:cur.items.map(it=>Object.assign({},it)), daily:false, light:cur.light }); }
+function quitQuiz(){ if(confirm("中断してホームに戻りますか？")) goHome(); }
+function goHome(){ cancelAuto(); timerPause(); show("home"); renderHome(); }
+function setTitle(){
+  if(cur.kind==="set") return `第${cur.set+1}回　${SUBJECTS[cur.subj].sets[cur.set].name}`;
+  if(cur.kind==="day") return getSet(cur.subj, cur.set).name + (cur.plus ? (NIGATE[SUBJECTS[cur.subj].id] ? "＋苦手5問" : "＋復習5問") : "");
+  if(cur.kind==="mix") return cur.light ? "軽めの総復習" : cur.plus ? "今日の15問" : "今日の10問";
+  return { warm:"ウォームアップ", review:"弱点補強2回目", week:"週末の弱点補強" }[cur.kind];
+}
+
+/* 問題表示の共通部分 */
+function prepareQ(){
+  document.getElementById("resBox").innerHTML = "";
+  document.getElementById("tools").classList.remove("hidden");
+  document.getElementById("padWrap").classList.remove("hidden","locked");
+  locked = false; clearPad();
+  const gb = document.getElementById("gradeBtn"); gb.disabled=false; gb.textContent="答え合わせ"; gb.onclick = onGrade;
+}
+function renderQ(){
+  const it = cur.items[cur.idx], n = cur.items.length;
+  if(isMulti()){
+    document.getElementById("quiz").style.setProperty("--c", SUBJECTS[it.si].color);
+    document.getElementById("qTag").textContent = SUBJECTS[it.si].name;
+  }
+  const unit = unitLabel(it);
+  document.getElementById("qSetName").textContent =
+    cur.kind==="set" ? setTitle() :
+    cur.kind==="day" ? `${it.st.name}　（${it.st.src||""}）` :
+    cur.kind==="mix" ? `${cur.light?"軽めの総復習":cur.plus?"今日の15問":"今日の10問"}　（${unit}より）` :
+    cur.kind==="warm" ? `ウォームアップ：前日までの弱点　（${unit}）` :
+    cur.kind==="week" ? (it.mc ? `週末の弱点補強：4択で仕上げ　あと${n-cur.idx}問` : `週末の弱点補強：${it.pop?"抜き打ちチェック":"記述"}　（${unit}）　あと${n-cur.idx}問`) :
+    it.mc ? `弱点補強2回目：4択で仕上げ　あと${n-cur.idx}問` : `弱点補強2回目：記述　（${unit}）`;
+  document.getElementById("qText").innerHTML = `<span style="color:var(--c)">問${cur.idx+1}</span>　${it.q[0]}`;
+  document.getElementById("qCount").textContent = `${cur.idx+1} / ${n}`;
+  document.getElementById("qProg").style.width = (cur.idx/n*100)+"%";
+  prepareQ();
+  if(it.mc) return renderMC(it);
+  timerStart();
+}
+/* ============================================================
+   タイマー（解いている間だけ進む）
+   ============================================================ */
+let T = { limit:0, used:0, startAt:0, running:false, iv:null };
+function timerReset(limit){ timerPause(); T = { limit, used:0, startAt:0, running:false, iv:null }; tick(); }
+function elapsed(){ return T.used + (T.running ? (performance.now()-T.startAt)/1000 : 0); }
+function timerStart(){
+  if(!T.limit || T.running || !cur || cur.mode!=="test") { tick(); return; }
+  T.running = true; T.startAt = performance.now(); T.iv = setInterval(tick, 200); tick();
+}
+function timerPause(){
+  if(T.running){ T.used += (performance.now()-T.startAt)/1000; T.running = false; }
+  clearInterval(T.iv); T.iv = null; tick();
+}
+function tick(){
+  const el = document.getElementById("qTimer");
+  if(!T.limit || !cur || cur.mode!=="test"){ el.classList.add("hidden"); return; }
+  const left = T.limit - elapsed();
+  el.classList.remove("hidden");
+  el.textContent = "⏱ " + fmt(left);
+  el.classList.toggle("warn", left<=30 && left>0);
+  el.classList.toggle("over", left<=0);
+  el.classList.toggle("paused", !T.running);
+  if(left<=0 && T.running && store.timeUp==="stop") timeUp();
+}
+function timeUp(){
+  timerPause(); cancelAuto();
+  for(let i=cur.idx;i<cur.items.length;i++){
+    const a = cur.answers[i];
+    if(!a || a.correct===null){
+      const q = cur.items[i].q;
+      cur.answers[i] = { q:q[0], answer:q[1], img:null, read:"（時間切れ）", correct:false, comment:"" };
+    }
+  }
+  cur.timedOut = true; finishSet();
+}
+
+/* ============================================================
+   手書きパッド
+   ============================================================ */
+const pad = document.getElementById("pad"), ctx = pad.getContext("2d");
+let strokes = [], curStroke = null, locked = false, activePointer = null;
+function setPadRows(n){ pad.style.height = n ? (n*83+30)+"px" : ""; resizePad(); }
+function resizePad(){
+  const r = pad.getBoundingClientRect(), dpr = window.devicePixelRatio||1;
+  pad.width = Math.round(r.width*dpr); pad.height = Math.round(r.height*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0); redraw();
+}
+window.addEventListener("resize",()=>{ if(!document.getElementById("quiz").classList.contains("hidden")) resizePad(); });
+function pt(e){ const r = pad.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top, p:(e.pointerType==="pen"&&e.pressure>0)?e.pressure:0.5}; }
+function drawSeg(a,b){
+  ctx.strokeStyle="#111"; ctx.lineCap="round"; ctx.lineJoin="round";
+  ctx.lineWidth = 2 + b.p*3.2;
+  ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+}
+function drawStroke(s){
+  if(s.length===1){ ctx.fillStyle="#111"; ctx.beginPath(); ctx.arc(s[0].x,s[0].y,2.5,0,7); ctx.fill(); return; }
+  for(let i=1;i<s.length;i++) drawSeg(s[i-1],s[i]);
+}
+function redraw(){ const r = pad.getBoundingClientRect(); ctx.clearRect(0,0,r.width,r.height); strokes.forEach(drawStroke); updateHint(); }
+function updateHint(){ document.getElementById("padHint").style.display = strokes.length?"none":"block"; }
+pad.addEventListener("pointerdown",e=>{
+  if(locked) return;
+  if(store.penOnly && e.pointerType==="touch") return;
+  if(activePointer!==null) return;
+  activePointer = e.pointerId; pad.setPointerCapture(e.pointerId);
+  curStroke = [pt(e)]; strokes.push(curStroke); drawStroke(curStroke); updateHint();
+  e.preventDefault();
+});
+pad.addEventListener("pointermove",e=>{
+  if(e.pointerId!==activePointer || !curStroke) return;
+  const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+  evs.forEach(ev=>{ const p = pt(ev), last = curStroke[curStroke.length-1]; curStroke.push(p); drawSeg(last,p); });
+  e.preventDefault();
+});
+function endStroke(e){ if(e.pointerId!==activePointer) return; activePointer=null; curStroke=null; }
+pad.addEventListener("pointerup",endStroke);
+pad.addEventListener("pointercancel",endStroke);
+function undo(){ if(locked) return; strokes.pop(); redraw(); }
+function clearPad(){ if(locked) return; strokes=[]; redraw(); }
+
+/* 書いた部分だけを白背景で切り出して画像化（長辺768px以内でトークン節約） */
+function exportImage(){
+  let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
+  strokes.forEach(s=>s.forEach(p=>{minX=Math.min(minX,p.x);minY=Math.min(minY,p.y);maxX=Math.max(maxX,p.x);maxY=Math.max(maxY,p.y);}));
+  const m=20; minX-=m;minY-=m;maxX+=m;maxY+=m;
+  const w=maxX-minX, h=maxY-minY;
+  const scale = Math.min(1.5, 768/Math.max(w,h));
+  const c = document.createElement("canvas"); c.width=Math.round(w*scale); c.height=Math.round(h*scale);
+  const x = c.getContext("2d"); x.fillStyle="#fff"; x.fillRect(0,0,c.width,c.height);
+  x.setTransform(scale,0,0,scale,-minX*scale,-minY*scale);
+  x.strokeStyle="#000"; x.fillStyle="#000"; x.lineCap="round"; x.lineJoin="round";
+  strokes.forEach(s=>{
+    if(s.length===1){ x.beginPath(); x.arc(s[0].x,s[0].y,2.5,0,7); x.fill(); return; }
+    for(let i=1;i<s.length;i++){ x.lineWidth=2+s[i].p*3.2; x.beginPath(); x.moveTo(s[i-1].x,s[i-1].y); x.lineTo(s[i].x,s[i].y); x.stroke(); }
+  });
+  return c.toDataURL("image/jpeg", 0.85);
+}
+
+/* ============================================================
+   Gemini呼び出し・照合
+   ============================================================ */
+function stripTags(h){ const d=document.createElement("div"); d.innerHTML=String(h).replace(/<br>/g," / "); return d.textContent; }
+async function callGemini(model, prompt, img, maxTok, thinking){
+  const parts = [{text:prompt}];
+  if(img) parts.push({inline_data:{mime_type:"image/jpeg", data:img.split(",")[1]}});
+  const body = { contents:[{parts}],
+    generationConfig:{ temperature: img?0:0.7, responseMimeType:"application/json", maxOutputTokens:maxTok,
+      thinkingConfig:{ thinkingLevel: thinking||"minimal" } } };
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+  const call = b => fetch(url,{ method:"POST", headers:{"Content-Type":"application/json","x-goog-api-key":store.key}, body:JSON.stringify(b) });
+  let res = await call(body);
+  if(res.status===400){
+    // 思考レベル指定に対応しないモデルの場合は、指定を外して再送
+    delete body.generationConfig.thinkingConfig; body.generationConfig.maxOutputTokens = Math.max(1024,maxTok);
+    res = await call(body);
+  }
+  if(!res.ok){ let m="HTTP "+res.status; try{ const j=await res.json(); m=j.error?.message?.slice(0,80)||m; }catch(e){} throw new Error(m); }
+  const j = await res.json();
+  const t = j.candidates?.[0]?.content?.parts?.map(p=>p.text||"").join("")||"";
+  const mm = t.match(/\{[\s\S]*\}/); if(!mm) throw new Error("応答を読み取れません");
+  return JSON.parse(mm[0]);
+}
+/* 照合用の正規化（全角英数→半角、空白・句読点除去、英字は小文字） */
+function norm(x){ return String(x||"").normalize("NFKC").replace(/[\s　.,。、・「」『』"'’]/g,"").toLowerCase(); }
+/* 完全一致判定：送り仮名つきで書いた場合も許可（例：険＋しい） */
+function exactMatch(read, q){
+  const r = norm(read); if(!r || r.includes("?")||r.includes("？")) return false;
+  const after = norm(stripTags((String(q[0]).split("</em>")[1])||""));
+  return q.slice(1).some(a=>{
+    const n = norm(a);
+    if(r===n) return true;
+    return r.startsWith(n) && after.startsWith(r.slice(n.length)) && /^[ぁ-ゟ]+$/.test(r.slice(n.length));
+  });
+}
+async function aiGrade(st, q, img){
+  /* ① 漢字・英単語：正解を見せずに書き起こし → プログラムで照合 */
+  if(st.mode==="exact"){
+    const prompt =
+`手書き文字を一字一句そのまま書き起こす。誤字・脱字・つづり誤りも直さず、推測で補わない。読めない字は?。
+文字種:${st.hint}
+JSONのみ:{"read":"書き起こし","unclear":true/false}`;
+    const r = await callGemini((store.modelRead||"gemini-flash-latest").trim(), prompt, img, 120);
+    const ok = exactMatch(r.read, q);
+    return { read:r.read, correct:ok,
+      comment: (r.unclear ? "読み取りに自信がありません。判定を確認してください。" : (ok ? "正解！" : `正しくは「${q[1]}」`)) };
+  }
+  /* ② 数式・用語：正解を渡して意味で判定 */
+  const prompt =
+`中3の手書き解答を採点。画像の文字を推測せず読み取り、基準に従い判定。
+問題:${stripTags(q[0])}
+正解:${q.slice(1).join("／")}
+基準:${st.rule}
+JSONのみ:{"read":"読取","correct":true/false,"comment":"20字以内"}`;
+  return await callGemini((store.modelJudge||"gemini-flash-lite-latest").trim(), prompt, img, 200);
+}
+
+/* ============================================================
+   答え合わせ（本番・トレーニング共通）
+   ============================================================ */
+function curItem(){ return cur.mode==="test" ? cur.items[cur.idx] : cur.queue[cur.tpos]; }
+async function onGrade(){
+  if(!strokes.length){ alert("答えを書いてから答え合わせをしてください。"); return; }
+  const it = curItem();
+  if(cur.mode==="train" && it.kind==="write") return gradeWrite();
+  timerPause();
+  const q = it.q, st = it.st;
+  const img = exportImage();
+  locked = true; document.getElementById("padWrap").classList.add("locked");
+  const gb = document.getElementById("gradeBtn"); gb.disabled = true;
+  const rec = { q:q[0], answer:q[1], img, read:"", correct:null, comment:"" };
+  if(cur.mode==="test") cur.answers[cur.idx] = rec; else it.rec = rec;
+  if(store.key){
+    gb.innerHTML = '<span class="spinner"></span>採点中…';
+    try{
+      const r = await aiGrade(st, q, img);
+      rec.read = r.read||""; rec.correct = !!r.correct; rec.comment = r.comment||"";
+    }catch(err){ rec.comment = "AI採点に失敗しました（"+err.message+"）。自己採点してください。"; }
+  }
+  document.getElementById("tools").classList.add("hidden");
+  renderResult(rec);
+}
+function nextLabel(){
+  if(cur.mode==="test") return cur.idx===cur.items.length-1 ? "結果を見る" : "次の問題へ →";
+  return cur.tpos>=cur.queue.length-1 ? "トレーニング終了" : "次へ →";
+}
+function renderResult(rec){
+  const box = document.getElementById("resBox");
+  if(rec.correct===null){
+    box.innerHTML = `<div class="res">
+      <div class="row"><b>正解</b><span style="font-size:22px;font-weight:700">${rec.answer}</span></div>
+      ${rec.comment?`<div class="cmt">${esc(rec.comment)}</div>`:""}
+      <div class="cmt">自分の答えと比べて、○か×を選んでください。</div>
+      <div class="fix"><button class="btn ok" onclick="selfMark(true)">○ 正解だった</button><button class="btn ng" onclick="selfMark(false)">× まちがえた</button></div>
+    </div>`;
+    return;
+  }
+  const auto = rec.correct && store.autoNext>0;
+  box.innerHTML = `<div class="res ${rec.correct?"ok":"ng"}">
+    <div><span class="mark">${rec.correct?"○":"×"}</span><span style="font-weight:700">${rec.correct?"正解！":"不正解"}</span></div>
+    <div class="row"><b>読み取り</b>${esc(rec.read)||"（読み取れず）"}</div>
+    <div class="row"><b>正解</b><span style="font-weight:700">${rec.answer}</span></div>
+    ${rec.comment?`<div class="cmt">${esc(rec.comment)}</div>`:""}
+    <div class="fix">
+      <button class="btn primary" onclick="nextQ()">${nextLabel()}</button>
+      <button class="btn" onclick="flipMark()">${rec.correct?"読み間違い：×にする":"読み間違い：○にする"}</button>
+    </div>
+    ${auto?`<div class="autobar"><i style="animation-duration:${store.autoNext}s"></i></div>`:""}
+  </div>`;
+  if(auto) autoTimer = setTimeout(nextQ, store.autoNext*1000);
+}
+let autoTimer = null;
+function cancelAuto(){ clearTimeout(autoTimer); autoTimer = null; }
+function esc(s){ return String(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function curRec(){ return cur.mode==="test" ? cur.answers[cur.idx] : cur.queue[cur.tpos].rec; }
+function selfMark(ok){ const r=curRec(); r.correct=ok; r.read=r.read||"（自己採点）"; nextQ(); }
+function flipMark(){ cancelAuto(); const r=curRec(); r.correct=!r.correct; r.comment="（判定を手動で修正）"; renderResult(r); cancelAuto(); }
+function nextQ(){
+  cancelAuto();
+  if(cur.mode==="train") return trainNext();
+  if(cur.idx<cur.items.length-1){ cur.idx++; renderQ(); }
+  else finishSet();
+}
+
+/* ============================================================
+   結果
+   ============================================================ */
+function finishSet(){
+  timerPause(); cancelAuto();
+  // 解答を記録（問題ごとの最新成績は記述のときだけ更新）
+  const t = todayStr(), kindCode = { set:"t", day:"t", mix:"t", warm:"w", review:"r", week:"k" }[cur.kind];
+  cur.items.forEach((it,i)=>{
+    const a = cur.answers[i]; if(!a) return;
+    logAtt(it.key, a.correct, it.mc ? "c" : kindCode);
+    if(it.mc) return;
+    const st = store.qstat[it.key] || { n:0, w:0, ok:null, last:"" };
+    st.n++; if(!a.correct) st.w++; st.ok = !!a.correct; st.last = t;
+    store.qstat[it.key] = st;
+  });
+  addStudy(Date.now()-cur.t0);
+  if(isMulti()) return finishReview();
+
+  const s = curSubj();
+  const score = cur.answers.filter(a=>a&&a.correct).length;
+  let line = "";
+  if(cur.kind==="set"){
+    store.best[s.id] = store.best[s.id]||{};
+    const prev = store.best[s.id][cur.set];
+    const isNew = prev==null || score>prev;
+    if(isNew) store.best[s.id][cur.set] = score;
+    line = isNew ? (prev==null?"初回記録！":`自己ベスト更新！（前回まで ${prev}点）`) : `自己ベスト ${prev}点`;
+  } else line = cur.plus ? "今日の15問" : "今日の10問";
+  if(cur.daily && cur.sp!=null){
+    /* 特別メニュー：セットごとの点を記録し、全部終わったら10点満点に換算して「今日の点」にする */
+    const p = planState(), plan = todayPlan(), n = (plan.sp ? (plan.sp.subjects[s.id]||[]).length : 1) || 1;
+    p.sp = p.sp||{}; p.sp[s.id] = p.sp[s.id]||{}; p.sp[s.id][cur.sp] = score;
+    const h = histToday(), old = h.subj[s.id] && h.subj[s.id].raw ? h.subj[s.id] : { raw:[0,0], used:0, limit:0, wrong:[] };
+    const raw = [old.raw[0]+score, old.raw[1]+10], wrongs = old.wrong.concat(cur.items.filter((it,i)=>!cur.answers[i].correct).map(it=>it.key));
+    h.subj[s.id] = { score:Math.round(raw[0]/raw[1]*10), raw, used:old.used+Math.round(elapsed()), limit:old.limit+(T.limit||0), timedOut:false,
+      wrong:wrongs, kind:"day", set:cur.set };
+    if(Object.keys(p.sp[s.id]).length>=n) p.done[s.id] = h.subj[s.id].score;
+    line = `今日の${s.name}：${Object.keys(p.sp[s.id]).length}/${n}セット（合計 ${raw[0]}/${raw[1]}）`;
+    cur.daily = false;
+  }
+  const nq = cur.items.length, score10 = nq===10 ? score : Math.round(score/nq*10);
+  if(cur.daily){
+    const p = planState(); p.done[s.id] = score10;
+    histToday().subj[s.id] = { score:score10, raw:[score,nq], used:Math.round(elapsed()), limit:T.limit, timedOut:!!cur.timedOut,
+      wrong: cur.items.filter((it,i)=>!cur.answers[i].correct).map(it=>it.key), kind:cur.kind, set:cur.set };
+    cur.daily = false;
+  }
+  save(); syncDay();
+  document.getElementById("rTitle").textContent = `${s.name}　${setTitle()}`;
+  document.getElementById("rScore").innerHTML = nq===10 ? `${score}<small> / 10点</small>` : `${score}<small> / ${nq}問（10点満点で ${score10}点）</small>`;
+  if(T.limit){
+    const used = elapsed();
+    line += cur.timedOut ? `　／　⏱ 時間切れ（制限 ${fmt(T.limit)}）`
+      : `　／　⏱ ${fmt(used)}（制限 ${fmt(T.limit)}${used>T.limit?`、${fmt(used-T.limit)} オーバー`:""}）`;
+  }
+  document.getElementById("rBest").textContent = line;
+  const wrong = cur.answers.filter(a=>!a.correct).length;
+  document.getElementById("rTrain").innerHTML = wrong
+    ? `<div class="trainbox"><div class="t"><b>まちがえた ${wrong}問 をすぐに復習しよう</b><br>
+        漢字・単語・用語は「見て覚える→見ないで${store.writeN}回書く」、計算問題は類題を${store.simN}問ずつ解きます。</div>
+        <button class="btn primary" onclick="startTrain()">弱点トレーニングを始める →</button></div>`
+    : `<div class="trainbox"><div class="t"><b>全問正解！</b> この調子で次へ進もう。</div></div>`;
+  fillTable(cur.answers.map((a,i)=>({mark:a.correct, label:`問${i+1}　${a.q}`, img:a.img, read:a.read, answer:a.answer})));
+  show("result");
+}
+/* ウォームアップ・補強2回目の結果 */
+function finishReview(){
+  const w = cur.items.map((it,i)=>({it,a:cur.answers[i]})).filter(x=>x.a);
+  const wr = w.filter(x=>!x.it.mc), mc = w.filter(x=>x.it.mc);
+  const okW = wr.filter(x=>x.a.correct).length, okC = mc.filter(x=>x.a.correct).length;
+  let msg;
+  if(cur.daily){
+    const h = histToday(), p = planState();
+    if(cur.kind==="warm"){ h.warm = { n:wr.length, ok:okW }; p.warm = "done"; }
+    else if(cur.kind==="week"){ h.week = { w:[wr.length, okW], c:[mc.length, okC] }; p.weekReview = "done"; }
+    else { h.review = { w:[wr.length, okW], c:[mc.length, okC] }; p.review = "done"; }
+    cur.daily = false;
+  }
+  save(); syncDay(); if(cur.kind==="week") syncWeek(mondayOf(todayStr()));
+  if(cur.kind==="warm"){
+    msg = okW===wr.length ? "前日までの弱点、全部クリア！ この調子で5教科へ。" : `${okW}問クリア。まだの問題は、また出題されます。次は5教科へ。`;
+    document.getElementById("rScore").innerHTML = `${okW}<small> / ${wr.length}</small>`;
+  } else {
+    msg = cur.kind==="week" ? "🎉 1週間おつかれさま！ 来週もこの調子でいこう。"
+      : "🎉 今日のメニュー完了！ お疲れさま。まだ×の問題は、明日のウォームアップで出ます。";
+    document.getElementById("rScore").innerHTML = `${okW+okC}<small> / ${wr.length+mc.length}</small>`;
+  }
+  document.getElementById("rTitle").textContent = setTitle();
+  document.getElementById("rBest").textContent = cur.kind!=="warm" ? (mc.length ? `記述 ${okW}/${wr.length}　・　4択 ${okC}/${mc.length}` : `正解 ${okW}/${wr.length}`) : "";
+  if(T.limit){ const used = elapsed();
+    msg += cur.timedOut ? `　⏱ 時間切れ（制限 ${fmt(T.limit)}）。残りの問題は×になり、また出題されます。`
+      : `　⏱ ${fmt(used)}（制限 ${fmt(T.limit)}${used>T.limit?`、${fmt(used-T.limit)} オーバー`:""}）`; }
+  document.getElementById("rTrain").innerHTML = `<div class="trainbox"><div class="t"><b>${msg}</b></div>
+    <button class="btn primary" onclick="goHome()">今日のメニューへ →</button></div>`;
+  fillTable(w.map(({it,a},i)=>({ mark:a.correct, label:`${it.mc?"【4択】":""}${SUBJECTS[it.si].name}　${a.q}`, img:a.img, read:a.read, answer:a.answer })));
+  show("result");
+}
+function fillTable(rows){
+  document.getElementById("rBody").innerHTML = rows.map(a=>`<tr>
+    <td class="${a.mark?"m-ok":"m-ng"}">${a.mark?"○":"×"}</td>
+    <td>${a.label}</td>
+    <td>${a.img?`<img src="${a.img}" alt="">`:""}<div style="font-size:13px;color:var(--sub)">${esc(a.read)}</div></td>
+    <td style="font-weight:700">${a.answer}</td></tr>`).join("");
+}
+
+/* ============================================================
+   4択（仕上げ用。選択肢は同じ回の他の答え＝まぎらわしい語から作る）
+   4択で正解しても「苦手」からは外さない（記述で正解したときだけ外す）
+   ============================================================ */
+function distractors(it){
+  const ans = norm(it.q[1]), pool = [];
+  const add = a => { const n = norm(a); if(n && n!==ans && !it.q.slice(1).some(x=>norm(x)===n) && !pool.some(p=>norm(p)===n)) pool.push(a); };
+  shuffle(it.st.qs.map(q=>q[1])).forEach(add);
+  if(pool.length<3) shuffle(allSetsOf(it.si).flatMap(x=>x.st.qs.map(q=>q[1]))).forEach(add);
+  return pool.slice(0,3);
+}
+function renderMC(it){
+  document.getElementById("padWrap").classList.add("hidden");
+  document.getElementById("tools").classList.add("hidden");
+  const opts = shuffle([it.q[1], ...distractors(it)]);
+  cur.mcOpts = opts;
+  document.getElementById("resBox").innerHTML = `<div class="mc">${opts.map((o,i)=>`<button onclick="chooseMC(${i})">${esc(o)}</button>`).join("")}</div>`;
+}
+function chooseMC(i){
+  const it = cur.items[cur.idx], picked = cur.mcOpts[i], ok = norm(picked)===norm(it.q[1]);
+  cur.answers[cur.idx] = { q:it.q[0], answer:it.q[1], img:null, read:`（4択）${picked}`, correct:ok, comment:"" };
+  const btns = [...document.querySelectorAll(".mc button")];
+  btns.forEach((b,j)=>{ b.disabled = true; if(norm(cur.mcOpts[j])===norm(it.q[1])) b.classList.add("right"); });
+  if(!ok) btns[i].classList.add("wrong");
+  const box = document.getElementById("resBox");
+  box.insertAdjacentHTML("beforeend", ok
+    ? `<div class="autobar"><i style="animation-duration:${Math.max(0.8,store.autoNext||0.8)}s"></i></div>`
+    : `<div class="fix" style="margin-top:12px"><button class="btn primary" onclick="nextQ()">${nextLabel()}</button></div>`);
+  if(ok) autoTimer = setTimeout(nextQ, Math.max(0.8,store.autoNext||0.8)*1000);
+}
+
+/* ============================================================
+   今日の評価（AIが文章を作り、ブラウザの音声で読み上げ）
+   数字はアプリが集計したものだけをAIに渡す
+   ============================================================ */
+function dayStats(date){
+  const h = store.hist[date]; if(!h) return null;
+  const subj = SUBJECTS.filter(s=>h.subj[s.id]).map(s=>{
+    const x = h.subj[s.id];
+    const wrong = (x.wrong||[]).map(itemFromKey).filter(Boolean).map(it=>({ 単元:it.st.name, 問題:stripTags(it.q[0]), 正解:it.q[1] }));
+    const st = (x.kind==="day"||x.kind==="set") ? getSet(SUBJECTS.indexOf(s), x.set) : null;
+    return { 教科:s.name, 単元:/^x/.test(String(x.set))?"診断④対策":(st?st.name+(x.raw&&x.raw[1]===15?"＋苦手・復習5問":""):"今日の15問"), 点数:x.score, 素点:x.raw?`${x.raw[0]}/${x.raw[1]}問`:undefined, 時間秒:x.used, 制限秒:x.limit, 時間切れ:x.timedOut, まちがえた問題:wrong };
+  });
+  return { 日目:h.day, 日付:date, 合計:subj.reduce((t,x)=>t+x.点数,0), 教科別:subj,
+    ウォームアップ: h.warm ? `${h.warm.ok}/${h.warm.n}問正解` : "なし",
+    次の大きな予定: (nb=>nb?`${nb.label}まであと${daysUntil(nb.date)}日`:"なし")(nextBigEvent()) };
+}
+function prevDayDate(){
+  const t = todayStr();
+  return Object.keys(store.hist).filter(d=>d<t && Object.keys(store.hist[d].subj||{}).length).sort().pop() || null;
+}
+async function openEval(){
+  const p = planState(), h = histToday();
+  let today = dayStats(todayStr());
+  if(!today || !today.教科別.length) today = { 日目:studyNo(todayStr()), 合計:SUBJECTS.reduce((s,x)=>s+(p.done[x.id]||0),0),
+    教科別: SUBJECTS.filter(s=>p.done[s.id]!=null).map(s=>({ 教科:s.name, 点数:p.done[s.id], 時間秒:0, 制限秒:0, 時間切れ:false, まちがえた問題:[] })), ウォームアップ:"なし" };
+  const pd = prevDayDate(), prev = pd ? dayStats(pd) : null;
+  document.getElementById("eTitle").textContent = `今日の評価　${mdLabel(todayStr())}（${WD[parseDate(todayStr()).getDay()]}）`;
+  document.getElementById("eExtra").innerHTML = "";
+  document.getElementById("eShare").innerHTML = "";
+  document.getElementById("eStats").innerHTML = `<thead><tr><th>教科</th><th>点数</th><th>時間</th><th>まちがえた単元</th></tr></thead><tbody>${
+    today.教科別.map(x=>`<tr><td>${x.教科}</td><td style="font-weight:700">${x.点数} / 10${x.素点?`<br><small>（${x.素点}）</small>`:""}</td><td>${x.制限秒?(x.時間切れ?"時間切れ":fmt(x.時間秒)+" / "+fmt(x.制限秒)):fmt(x.時間秒)}</td><td>${[...new Set(x.まちがえた問題.map(w=>w.単元))].join("、")||"—"}</td></tr>`).join("")
+  }<tr><td><b>合計</b></td><td style="font-weight:800">${today.合計} / 50</td><td colspan="2">${prev?`前回（${mdLabel(prev.日付)}）は ${prev.合計} / 50`:""}</td></tr></tbody>`;
+  const nextBtn = () => document.getElementById("eNext").innerHTML = p.review ? "" :
+    `<div class="trainbox" style="margin-top:14px"><div class="t"><b>最後に、今日まちがえた問題をもう一度。</b><br>すべて記述で、もう一度書いて覚えます。</div>
+     <button class="btn primary" onclick="startReview()">④ 弱点補強2回目へ →</button></div>`;
+  show("evalv"); nextBtn();
+  const box = document.getElementById("eText");
+  if(h.evalText){ box.textContent = h.evalText; p.evald="done"; save(); return; }
+  box.innerHTML = '<span class="spinner" style="border-color:var(--accent);border-top-color:transparent"></span> 評価を作っています…';
+  let text = "";
+  if(store.key){
+    try{
+      const prompt =
+`あなたは中学3年生を指導する${TEACHER}下のデータは生徒の今日の学習結果。これをもとに、読み上げ用の「今日の評価」を書く。
+条件：
+・話し言葉で、300〜400字（読み上げて1分半くらい）。生徒に直接話しかける。
+・構成は ①よかった点を1つ、具体的に ②弱点を2〜3つ、単元名や語句を具体的に挙げて ③明日の目標を1つ。
+・前回のデータがあれば、伸びた点や下がった点に一言ふれる。
+・数字はデータにあるものだけを使い、推測で作らない。
+・読み上げるので、記号、箇条書き、絵文字、括弧、英字の略語は使わない。
+今日のデータ:${JSON.stringify(today)}
+前回のデータ:${prev?JSON.stringify({日目:prev.日目,合計:prev.合計,教科別:prev.教科別.map(x=>({教科:x.教科,点数:x.点数}))}):"なし"}
+JSONのみ:{"text":"評価の文章"}`;
+      const r = await callGemini((store.modelRead||"gemini-flash-latest").trim(), prompt, null, 2048, "low");
+      text = String(r.text||"").trim();
+    }catch(e){ text = ""; }
+  }
+  if(!text) text = localEval(today, prev);
+  h.evalText = text; p.evald = "done"; save(); syncDay();
+  if(document.getElementById("evalv").classList.contains("hidden")) return;
+  box.textContent = text;
+  speakEval();
+}
+/* AIを使わない場合の評価文 */
+function localEval(d, prev){
+  const best = [...d.教科別].sort((a,b)=>b.点数-a.点数)[0], worst = [...d.教科別].sort((a,b)=>a.点数-b.点数)[0];
+  const units = [...new Set(d.教科別.flatMap(x=>x.まちがえた問題.map(w=>x.教科+"の"+w.単元)))].slice(0,3);
+  let t = `今日は${d.日目}日目、5教科の合計は50点中${d.合計}点でした。`;
+  if(prev) t += d.合計>prev.合計 ? `前回より${d.合計-prev.合計}点上がっています。いい調子です。` : d.合計<prev.合計 ? `前回より${prev.合計-d.合計}点下がりましたが、気にしすぎなくて大丈夫です。` : "前回と同じ点数です。";
+  t += `一番よかったのは${best.教科}で、10問中${best.点数}問正解でした。`;
+  if(units.length) t += `まちがいが多かったのは、${units.join("、")}です。`;
+  t += `明日は、${worst.教科}をもう一度ていねいに確認しようね。このあとの弱点補強で、今日まちがえた問題をもう一度解いておこうね。`;
+  return t;
+}
+/* ============================================================
+   読み上げ（若くやさしい女性の声を優先）
+   ============================================================ */
+const FEMALE = /Nanami|Shiori|Mayu|Aoi|Haruka|Ayumi|Sayaka|Kyoko|O-?ren|Google/i;
+const MALE = /Keita|Ichiro|Daichi|Naoki|Otoya|Hattori|Masaru/i;
+function jaVoices(){ return (window.speechSynthesis ? speechSynthesis.getVoices() : []).filter(v=>/^ja/i.test(v.lang)); }
+function pickVoice(){
+  const vs = jaVoices();
+  if(store.voice){ const v = vs.find(v=>v.name===store.voice); if(v) return v; }
+  const fem = vs.filter(v=>FEMALE.test(v.name) && !MALE.test(v.name));
+  return fem.find(v=>/Nanami/i.test(v.name)) || fem.find(v=>/Natural|Online/i.test(v.name)) || fem[0]
+      || vs.find(v=>!MALE.test(v.name)) || vs[0] || null;
+}
+function speakText(text){
+  if(!window.speechSynthesis || !text) return;
+  stopSpeak();
+  const v = pickVoice();
+  text.split(/(?<=[。！？!?])/).forEach(part=>{
+    if(!part.trim()) return;
+    const u = new SpeechSynthesisUtterance(part);
+    u.lang = "ja-JP"; if(v) u.voice = v;
+    u.rate = store.rate||1.0; u.pitch = store.pitch||1.15;
+    speechSynthesis.speak(u);
+  });
+}
+function speakEval(){ speakText(document.getElementById("eText").textContent); }
+function stopSpeak(){ try{ if(window.speechSynthesis) speechSynthesis.cancel(); }catch(e){} }
+function fillVoiceSelect(){
+  const sel = document.getElementById("sVoice"); if(!sel) return;
+  const vs = jaVoices(), auto = pickVoice();
+  sel.innerHTML = `<option value="">おまかせ（若い女性の声を優先）${auto?"："+auto.name:""}</option>` +
+    vs.map(v=>`<option value="${esc(v.name)}">${esc(v.name)}${MALE.test(v.name)?"（男性）":FEMALE.test(v.name)?"（女性）":""}</option>`).join("");
+  sel.value = store.voice||"";
+}
+if(window.speechSynthesis) speechSynthesis.onvoiceschanged = fillVoiceSelect;
+function testVoice(){
+  const keep = { voice:store.voice, rate:store.rate, pitch:store.pitch };
+  store.voice = document.getElementById("sVoice").value;
+  store.rate = +document.getElementById("sRate").value; store.pitch = +document.getElementById("sPitch").value;
+  speakText("こんにちは。今日もいっしょにがんばろうね。まちがえた問題は、あとでもう一度確認しようね。");
+  Object.assign(store, keep);
+}
+/* 評価文の話し方（AIへの指示） */
+const TEACHER = "若くてやさしい女性の先生。生徒に寄りそう、やわらかい話し言葉（〜だね、〜しようね、〜できたね）で話す。";
+
+/* ============================================================
+   1週間の評価（日曜日）と先週との比較　※週は月曜はじまり
+   ============================================================ */
+function weekDatesOf(mon){
+  const end = addDays(mon,6);
+  return Object.keys(store.hist).filter(d=>d>=mon && d<=end && Object.keys(store.hist[d].subj||{}).length).sort();
+}
+/* ある日付の時点で「最後に記述で×」だった問題の数 */
+function weakCountAt(date){
+  const last = {};
+  store.att.forEach(a=>{ if(a[0]<=date && a[3]!=="c") last[a[1]] = a[2]; });
+  return Object.values(last).filter(v=>v===0).length;
+}
+function weekStats(mon){
+  const dates = weekDatesOf(mon); if(!dates.length) return null;
+  const start = mon, end = addDays(mon,6);
+  const subj = SUBJECTS.map(s=>{
+    let pts=0, n=0, used=0, un=0;
+    dates.forEach(d=>{ const x = store.hist[d].subj[s.id]; if(x){ pts+=x.score; n+=10; if(!x.timedOut && x.used && x.limit){ used+=x.used; un+=10; } } });
+    return { 教科:s.name, 正答率: n?Math.round(pts/n*100):null, 一問の平均秒: un?Math.round(used/un):null };
+  });
+  let P=0, N=0, U=0, UN=0;
+  dates.forEach(d=>Object.values(store.hist[d].subj).forEach(x=>{ P+=x.score; N+=10; if(!x.timedOut && x.used && x.limit){ U+=x.used; UN+=10; } }));
+  const daily = dates.map(d=>({ 日付:d, 曜日:WD[parseDate(d).getDay()], 合計:Object.values(store.hist[d].subj).reduce((t,x)=>t+x.score,0) }));
+  // 定着率：前の日にまちがえた問題に、この週あらためて記述で出会ったとき（各問題1回目）に正解できた割合
+  const lastWrong = {}, counted = {}; let tries=0, ok=0;
+  store.att.forEach(a=>{
+    if(a[3]==="c") return;
+    const [d,k,r] = a;
+    if(d>=start && d<=end && lastWrong[k] && lastWrong[k]<d && !counted[k]){ counted[k]=1; tries++; if(r) ok++; }
+    if(!r) lastWrong[k] = d;
+  });
+  // 単元別のまちがい（記述）
+  const units = {};
+  store.att.forEach(a=>{
+    if(a[3]==="c" || a[2] || a[0]<start || a[0]>end) return;
+    const it = itemFromKey(a[1]); if(!it) return;
+    const u = `${SUBJECTS[it.si].name}・${it.st.name}`; units[u] = (units[u]||0)+1;
+  });
+  return { 週:weekLabel(mon), 取り組んだ日数:dates.length, 全体の正答率: N?Math.round(P/N*100):null,
+    一問の平均秒: UN?Math.round(U/UN):null, 教科別:subj, 毎日の合計:daily,
+    週末の苦手な問題数: weakCountAt(end), 定着率: tries?Math.round(ok/tries*100):null, 定着の対象問題数: tries,
+    まちがいの多い単元: Object.entries(units).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([u,c])=>({単元:u, 回数:c})), mon, end };
+}
+function diff(a,b,unit,lowerIsBetter){
+  if(a==null || b==null) return "";
+  const d = a-b; if(!d) return `<span style="color:var(--sub)">±0</span>`;
+  const good = lowerIsBetter ? d<0 : d>0;
+  return `<span style="color:${good?"var(--ok)":"var(--ng)"};font-weight:700">${d>0?"+":""}${d}${unit}</span>`;
+}
+function weekChart(c, p){
+  const W=560, H=170, L=34, R=16, T=12, B=26, x=i=>L+(W-L-R)*i/6, y=v=>T+(H-T-B)*(1-v/50);
+  const idx = d => (parseDate(d).getDay()+6)%7;   // 月=0 … 日=6
+  const line = (pts,dash,col)=>pts.length?`<polyline fill="none" stroke="${col}" stroke-width="3" ${dash?'stroke-dasharray="6 5"':""} points="${pts.map(p=>`${x(idx(p.日付))},${y(p.合計)}`).join(" ")}"/>`+
+    pts.map(p=>`<circle cx="${x(idx(p.日付))}" cy="${y(p.合計)}" r="4" fill="${col}"/>`).join(""):"";
+  const grid = [0,10,20,30,40,50].map(v=>`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="#e5ded0"/><text x="${L-6}" y="${y(v)+4}" font-size="11" text-anchor="end" fill="#6b7680">${v}</text>`).join("");
+  const xl = [..."月火水木金土日"].map((w,i)=>`<text x="${x(i)}" y="${H-6}" font-size="12" text-anchor="middle" fill="#6b7680">${w}</text>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;display:block">${grid}${xl}${line(p?p.毎日の合計:[],true,"#a9b2ba")}${line(c.毎日の合計,false,"var(--accent)")}</svg>
+    <div style="font-size:13px;color:var(--sub)">━ 今週　${p?"┅ 先週":""}（5教科の合計点）</div>`;
+}
+async function openWeekEval(){
+  const p = planState(), mon = mondayOf(todayStr()), cs = weekStats(mon), ps = weekStats(addDays(mon,-7));
+  if(!cs){ alert("今週の記録がまだありません。"); return; }
+  document.getElementById("eTitle").textContent = `1週間の評価　${cs.週}`;
+  const row = (lb, a, b, unit, lower)=>`<tr><td>${lb}</td><td>${b==null?"—":b+unit}</td><td style="font-weight:800">${a==null?"—":a+unit}</td><td>${diff(a,b,unit==="%"?"ポイント":unit,lower)}</td></tr>`;
+  document.getElementById("eStats").innerHTML = `<thead><tr><th>項目</th><th>先週</th><th>今週</th><th>変化</th></tr></thead><tbody>
+    ${row("取り組んだ日数", cs.取り組んだ日数, ps&&ps.取り組んだ日数, "日")}
+    ${row("全体の正答率", cs.全体の正答率, ps&&ps.全体の正答率, "%")}
+    ${cs.教科別.map((x,i)=>row("　"+x.教科, x.正答率, ps&&ps.教科別[i].正答率, "%")).join("")}
+    ${row("苦手な問題の数（週末時点）", cs.週末の苦手な問題数, ps&&ps.週末の苦手な問題数, "問", true)}
+    ${row("定着率（まちがえた問題に再挑戦して正解）", cs.定着率, ps&&ps.定着率, "%")}
+    ${row("1問の平均時間", cs.一問の平均秒, ps&&ps.一問の平均秒, "秒", true)}</tbody>`;
+  document.getElementById("eExtra").innerHTML = `<div class="ebox" style="border-left-color:var(--line)">${weekChart(cs, ps)}
+    <div style="margin-top:10px;font-size:15px"><b>まちがいの多い単元：</b>${cs.まちがいの多い単元.map(u=>`${u.単元}（${u.回数}回）`).join("、")||"なし"}</div>
+    ${ps?"":`<div style="margin-top:6px;font-size:13px;color:var(--sub)">先週の記録がないので、比較は来週からになります。</div>`}</div>`;
+  document.getElementById("eNext").innerHTML = p.weekReview ? "" :
+    `<div class="trainbox" style="margin-top:14px"><div class="t"><b>週末の弱点補強（約30分）</b><br>今週2回以上まちがえた問題と抜き打ちチェックを、すべて記述で。</div>
+     <button class="btn primary" onclick="startWeekReview()">② 週末の弱点補強へ →</button></div>`;
+  document.getElementById("eShare").innerHTML = `<button class="btn primary" onclick="shareWeek()">📤 おうちの人にLINEで送る</button><button class="btn" onclick="copyWeek()">📋 文章をコピー</button>`;
+  show("evalv");
+  const h = histToday(), box = document.getElementById("eText");
+  if(h.weekText){ box.textContent = h.weekText; p.weekEval="done"; save(); return; }
+  box.innerHTML = '<span class="spinner" style="border-color:var(--accent);border-top-color:transparent"></span> 1週間の評価を作っています…';
+  const strip = s => s && Object.fromEntries(Object.entries(s).filter(([k])=>!["mon","end"].includes(k)));
+  const nb = nextBigEvent();
+  let text = "";
+  if(store.key){
+    try{
+      const prompt =
+`あなたは${TEACHER}下のデータは中学3年生の1週間の学習結果。これをもとに、読み上げ用の「1週間の評価」を書く。
+条件：
+・話し言葉で、600〜800字（読み上げて2〜3分）。生徒に直接話しかける。
+・構成は ①この1週間でがんばったこと ②先週と比べて伸びたところを数字で（先週のデータがなければ、来週から比べられると伝える） ③まだ弱い単元を2〜3つ具体的に ④来週の目標を1つ。
+・次の大きな予定があれば、それに向けた一言を入れる。
+・数字はデータにあるものだけを使い、推測で作らない。
+・読み上げるので、記号、箇条書き、絵文字、括弧、英字の略語は使わない。パーセントは「パーセント」と書く。
+今週:${JSON.stringify(strip(cs))}
+先週:${ps?JSON.stringify(strip(ps)):"なし"}
+次の大きな予定:${nb?`${nb.label}（あと${daysUntil(nb.date)}日）`:"なし"}
+JSONのみ:{"text":"評価の文章"}`;
+      const r = await callGemini((store.modelRead||"gemini-flash-latest").trim(), prompt, null, 3000, "low");
+      text = String(r.text||"").trim();
+    }catch(e){ text = ""; }
+  }
+  if(!text) text = localWeekEval(cs, ps);
+  h.weekText = text; p.weekEval = "done"; save(); syncWeek(mon);
+  if(document.getElementById("evalv").classList.contains("hidden")) return;
+  box.textContent = text; speakEval();
+}
+function localWeekEval(c, p){
+  let t = `1週間おつかれさま。今週は${c.取り組んだ日数}日取り組んで、5教科の正答率は${c.全体の正答率}パーセントだったよ。`;
+  if(p){
+    const d = c.全体の正答率 - p.全体の正答率;
+    t += d>0 ? `先週より${d}ポイント上がったね。すごいね。` : d<0 ? `先週より${-d}ポイント下がったけど、問題の範囲が変わっているから気にしすぎなくて大丈夫だよ。` : "先週と同じだね。";
+    const dw = p.週末の苦手な問題数 - c.週末の苦手な問題数;
+    if(dw>0) t += `苦手な問題も${dw}問減ったよ。`;
+  } else t += "来週からは、先週との比較もできるようになるよ。";
+  if(c.定着率!=null) t += `まちがえた問題にもう一度挑戦したとき、${c.定着率}パーセント正解できたね。`;
+  if(c.まちがいの多い単元.length) t += `まだ弱いのは、${c.まちがいの多い単元.slice(0,3).map(u=>u.単元.replace("・","の")).join("、")}だね。`;
+  t += "このあとの弱点補強で、しっかり仕上げようね。";
+  return t;
+}
+/* 週末の弱点補強：すべて記述（今週2回以上まちがえた問題＋苦手＋抜き打ち） */
+function startWeekReview(){
+  const mon = mondayOf(todayStr()), end = addDays(mon,6);
+  const wrongCnt = {};
+  store.att.forEach(a=>{ if(a[3]!=="c" && !a[2] && a[0]>=mon && a[0]<=end) wrongCnt[a[1]]=(wrongCnt[a[1]]||0)+1; });
+  const weakKeys = Object.keys(store.qstat).filter(k=>store.qstat[k].ok===false || (wrongCnt[k]||0)>=2)
+    .sort((a,b)=>(wrongCnt[b]||0)-(wrongCnt[a]||0));
+  const weak = weakKeys.map(itemFromKey).filter(openItem).slice(0,12);
+  // 抜き打ち：今週の前半（月〜水）に正解して、その後出ていない問題
+  const earlyEnd = addDays(mon,2);
+  const okEarly = [...new Set(store.att.filter(a=>a[3]!=="c" && a[2] && a[0]>=mon && a[0]<=earlyEnd).map(a=>a[1]))]
+    .filter(k=>store.qstat[k] && store.qstat[k].ok && store.qstat[k].last<=earlyEnd && !weak.some(x=>x.key===k));
+  const pop = shuffle(okEarly).slice(0, Math.max(4, 16-weak.length)).map(itemFromKey).filter(openItem).map(x=>Object.assign(x,{pop:true}));
+  let written = shuffle(weak.concat(pop)).slice(0,24);
+  // 補強する問題が少ないときは、各教科の「今日の10問」から足して最低15問にする
+  if(written.length<15){
+    const lists = SUBJECTS.map((_,si)=>pickMix(si).filter(it=>!written.some(x=>x.key===it.key)));
+    for(let r=0; written.length<15 && r<10; r++) lists.forEach(l=>{ if(written.length<15 && l[r]) written.push(l[r]); });
+    written = shuffle(written);
+  }
+  if(!written.length){ alert("今週は補強する問題がありません。すばらしい！"); planState().weekReview="done"; save(); renderHome(); return; }
+  startSession({ kind:"week", si:-1, set:-1, items:written, daily:true });
+}
+
+/* ============================================================
+   1週間の結果をLINEなどで送る（設定不要）
+   ============================================================ */
+function weekReportText(){
+  const mon = mondayOf(todayStr()), cs = weekStats(mon), ps = weekStats(addDays(mon,-7)), h = store.hist[todayStr()]||{};
+  if(!cs) return "";
+  const pv = (a,b,u)=> b==null ? "" : `（先週 ${b}${u}）`;
+  const lines = [
+    `【手書き一問一答】${cs.週}の結果`,
+    `取り組んだ日数：${cs.取り組んだ日数}日`,
+    `正答率：${cs.全体の正答率}%${pv(cs.全体の正答率, ps&&ps.全体の正答率, "%")}`,
+    cs.教科別.map(x=>`${x.教科}${x.正答率==null?"—":x.正答率+"%"}`).join("　"),
+    `苦手な問題：${cs.週末の苦手な問題数}問${pv(0, ps&&ps.週末の苦手な問題数, "問")}`,
+    cs.定着率!=null ? `定着率（まちがえた問題に再挑戦して正解）：${cs.定着率}%` : "",
+    cs.まちがいの多い単元.length ? `まちがいの多い単元：${cs.まちがいの多い単元.slice(0,3).map(u=>u.単元).join("、")}` : "",
+    h.week ? `週末の弱点補強：${h.week.w[1]+h.week.c[1]}/${h.week.w[0]+h.week.c[0]}問` : "",
+    h.weekText ? `\n― 先生のひとこと ―\n${h.weekText}` : ""
+  ];
+  return lines.filter(Boolean).join("\n");
+}
+async function shareWeek(){
+  const text = weekReportText(); if(!text) return;
+  if(navigator.share){ try{ await navigator.share({ title:"1週間の結果", text }); return; }catch(e){ if(e && e.name==="AbortError") return; } }
+  window.open("https://line.me/R/share?text="+encodeURIComponent(text), "_blank");
+}
+async function copyWeek(){
+  const text = weekReportText(); if(!text) return;
+  try{ await navigator.clipboard.writeText(text); alert("コピーしました。LINEやメールに貼り付けて送ってください。"); }
+  catch(e){ prompt("この文章をコピーしてください", text); }
+}
+
+/* ============================================================
+   学習時間の記録
+   ============================================================ */
+function addStudy(ms){ if(!(ms>0)) return; const h = histToday(); h.sec = (h.sec||0) + Math.min(3600, Math.round(ms/1000)); save(); }
+
+/* ============================================================
+   記録ページ（保護者向け）
+   ============================================================ */
+function dayRow(date){
+  const h = store.hist[date]; if(!h) return null;
+  const sc = SUBJECTS.map(s=>h.subj&&h.subj[s.id] ? h.subj[s.id].score : null);
+  const total = sc.reduce((t,x)=>t+(x||0),0), n = sc.filter(x=>x!=null).length;
+  const units = [...new Set(Object.values(h.subj||{}).flatMap(x=>(x.wrong||[]).map(itemFromKey).filter(Boolean)
+    .map(it=>`${SUBJECTS[it.si].name}・${it.st.name}`)))];
+  const topics = SUBJECTS.map(s=>{ const x = h.subj&&h.subj[s.id]; if(!x) return ""; const st = x.kind==="day"||x.kind==="set" ? getSet(SUBJECTS.indexOf(s), x.set) : null; return st ? `${s.name}：${st.name}` : `${s.name}：${x.kind==="mix"?"今日の10問":"—"}`; }).filter(Boolean);
+  return { date, day:h.day, sc, total, n, warm:h.warm, review:h.review, week:h.week, mins:Math.round((h.sec||0)/60),
+    units, topics, evalText:h.evalText||"", weekText:h.weekText||"" };
+}
+function openLog(){
+  const dates = Object.keys(store.hist).filter(d=>Object.keys(store.hist[d].subj||{}).length || store.hist[d].week).sort().reverse();
+  const rows = dates.map(dayRow);
+  // 連続日数（今日がまだなら昨日から数える）
+  let streak = 0; { let d = todayStr(); if(!(store.hist[d] && Object.keys(store.hist[d].subj||{}).length)) d = addDays(d,-1);
+    while(store.hist[d] && Object.keys(store.hist[d].subj||{}).length){ streak++; d = addDays(d,-1); } }
+  const studied = rows.filter(r=>r.n);
+  const last7 = studied.filter(r=>r.date>addDays(todayStr(),-7) && r.n===5);
+  const avg = last7.length ? Math.round(last7.reduce((t,r)=>t+r.total,0)/last7.length*10)/10 : null;
+  const mins7 = rows.filter(r=>r.date>addDays(todayStr(),-7)).reduce((t,r)=>t+r.mins,0);
+  const mons = [...new Set(rows.map(r=>mondayOf(r.date)))];
+  const nb = nextBigEvent();
+  const card = (lb,v)=>`<div class="lcard"><small>${lb}</small><b>${v}</b></div>`;
+  document.getElementById("logBody").innerHTML = `
+    <div class="lcards">${card("取り組んだ日数", studied.length+"日")}${card("連続", streak+"日")}${card("直近7日の平均（5教科）", avg==null?"—":avg+" / 50")}${card("直近7日の学習時間", Math.floor(mins7/60)+"時間"+(mins7%60)+"分")}</div>
+    ${nb?`<p class="note">次の大きな予定：<b>${nb.label}</b>（${mdLabel(nb.date)}、あと${daysUntil(nb.date)}日）</p>`:""}
+    ${mons.map(mon=>{
+      const ws = weekStats(mon), ps = weekStats(addDays(mon,-7)), wr = rows.filter(r=>mondayOf(r.date)===mon);
+      const wt = wr.find(r=>r.weekText);
+      return `<h3 class="lh">${weekLabel(mon)}${ws?`　正答率 ${ws.全体の正答率}%${ps?`（先週 ${ps.全体の正答率}%）`:""}　苦手 ${ws.週末の苦手な問題数}問${ws.定着率!=null?`　定着率 ${ws.定着率}%`:""}`:""}</h3>
+        ${wt?`<details class="ldet"><summary>🔊 1週間の評価を読む</summary><div class="etext">${esc(wt.weekText)}</div><button class="btn" onclick="speakText(this.previousElementSibling.textContent)">▶ 音声で聞く</button></details>`:""}
+        <table class="rv ltab"><thead><tr><th>日付</th>${SUBJECTS.map(s=>`<th>${s.name}</th>`).join("")}<th>合計</th><th>時間</th><th>WU／補強</th><th>まちがえた単元・評価</th></tr></thead><tbody>
+        ${wr.map(r=>`<tr><td><b>${mdLabel(r.date)}</b><br><small>（${WD[parseDate(r.date).getDay()]}）</small></td>
+          ${r.sc.map(x=>`<td class="${x==null?"":x>=8?"good":x<=5?"bad":""}">${x==null?"—":x}</td>`).join("")}
+          <td><b>${r.n?r.total:"—"}</b></td><td>${r.mins?r.mins+"分":"—"}</td>
+          <td><small>${r.warm?`WU ${r.warm.ok}/${r.warm.n}`:"WU —"}<br>${r.review?`補強 ${r.review.w[1]+r.review.c[1]}/${r.review.w[0]+r.review.c[0]}`:"補強 —"}${r.week?`<br>週末 ${r.week.w[1]+r.week.c[1]}/${r.week.w[0]+r.week.c[0]}`:""}</small></td>
+          <td><small>${esc(r.units.slice(0,4).join("、"))||"—"}</small>${r.evalText?`<details class="ldet"><summary>今日の評価</summary><div class="etext">${esc(r.evalText)}</div><button class="btn" onclick="speakText(this.previousElementSibling.textContent)">▶ 音声で聞く</button></details>`:""}</td></tr>`).join("")}
+        </tbody></table>`;
+    }).join("") || `<p class="note">まだ記録がありません。「今日のメニュー」から始めると、ここに毎日の記録がたまります。</p>`}
+    <p class="note">${store.syncUrl && store.syncToken?"✓ スプレッドシートへの自動送信：オン":"スプレッドシートへの自動送信はオフです（⚙設定で送信先URLと合言葉を入れるとオンになります）"}</p>`;
+  show("logv");
+}
+
+/* ============================================================
+   Googleスプレッドシートへの自動送信（Google Apps Script のウェブアプリへPOST）
+   ============================================================ */
+function sendSheet(payload){
+  if(!store.syncUrl || !store.syncToken) return;
+  try{
+    fetch(store.syncUrl, { method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body: JSON.stringify(Object.assign({ token:store.syncToken||"" }, payload)) }).catch(()=>{});
+  }catch(e){}
+}
+function syncDay(date){
+  date = date || todayStr();
+  const r = dayRow(date); if(!r) return;
+  const row = { "日付":r.date, "曜日":WD[parseDate(r.date).getDay()] };
+  SUBJECTS.forEach((s,i)=>row[s.name] = r.sc[i]==null ? "" : r.sc[i]);
+  Object.assign(row, { "合計":r.n?r.total:"", "学習時間（分）":r.mins,
+    "ウォームアップ": r.warm ? `${r.warm.ok}/${r.warm.n}` : "",
+    "弱点補強2回目": r.review ? `${r.review.w[1]+r.review.c[1]}/${r.review.w[0]+r.review.c[0]}問` : "",
+    "週末の補強": r.week ? `${r.week.w[1]+r.week.c[1]}/${r.week.w[0]+r.week.c[0]}問` : "",
+    "取り組んだ単元": r.topics.join("／"), "まちがえた単元": r.units.join("、"), "今日の評価": r.evalText });
+  sendSheet({ sheet:"毎日", key:r.date, row });
+}
+function syncWeek(mon){
+  const ws = weekStats(mon); if(!ws) return;
+  const ps = weekStats(addDays(mon,-7)), h = store.hist[todayStr()]||{};
+  const row = { "週":ws.週, "取り組んだ日数":ws.取り組んだ日数, "正答率（%）":ws.全体の正答率, "先週の正答率（%）":ps?ps.全体の正答率:"" };
+  ws.教科別.forEach(x=>row[x.教科+"（%）"] = x.正答率==null?"":x.正答率);
+  Object.assign(row, { "苦手な問題の数":ws.週末の苦手な問題数, "先週の苦手な問題の数":ps?ps.週末の苦手な問題数:"",
+    "定着率（%）":ws.定着率==null?"":ws.定着率, "1問の平均時間（秒）":ws.一問の平均秒==null?"":ws.一問の平均秒,
+    "まちがいの多い単元":ws.まちがいの多い単元.map(u=>`${u.単元}(${u.回数})`).join("、"), "1週間の評価":h.weekText||"" });
+  sendSheet({ sheet:"週", key:ws.週, row });
+}
+function testSync(){
+  const url = document.getElementById("sSync").value.trim();
+  if(!url){ alert("送信先URLを入れてください。"); return; }
+  if(!document.getElementById("sSyncToken").value.trim()){ alert("合言葉を入れてください。"); return; }
+  const keep = [store.syncUrl, store.syncToken];
+  store.syncUrl = url; store.syncToken = document.getElementById("sSyncToken").value.trim();
+  sendSheet({ sheet:"テスト", key:new Date().toLocaleString("ja-JP"), row:{ "日時":new Date().toLocaleString("ja-JP"), "内容":"手書き一問一答アプリからのテスト送信です" } });
+  [store.syncUrl, store.syncToken] = keep;
+  alert("テスト送信しました。スプレッドシートに「テスト」シートができていれば成功です。");
+}
+
+/* ============================================================
+   弱点トレーニング
+   - 書き取り型（漢字・英単語・用語）：見て覚える → 見ないでN回書く
+   - 類題型（数学・数値の答え）：AIが作った類題をN問解く
+   ============================================================ */
+function practiceType(q){
+  if(curSubj().id==="sugaku") return "similar";
+  return /[0-9０-９]/.test(q[1]) ? "similar" : "write";
+}
+function startTrain(){
+  cur.t1 = Date.now();
+  const wrongItems = cur.items.filter((it,i)=>!cur.answers[i].correct);
+  const queue = [];
+  wrongItems.forEach(w=>{
+    if(practiceType(w.q)==="write"){ queue.push({ kind:"write", q:w.q, st:w.st, phase:"study", tries:0 }); return; }
+    if(!store.key){ queue.push({ kind:"retry", q:w.q, st:w.st }); return; }
+    const gen = genSimilar(w.q, store.simN);
+    for(let k=0;k<store.simN;k++) queue.push({ kind:"sim", base:w.q, st:w.st, k, gen, q:null });
+  });
+  cur.mode = "train"; cur.queue = queue; cur.tpos = 0;
+  document.getElementById("qTag").textContent = curSubj().name + "　弱点トレーニング";
+  tick(); show("quiz"); renderTrain();
+}
+async function genSimilar(q, n){
+  const prompt =
+`中3の高校入試対策。次の問題と同じ単元・同じ解き方・同じ難易度で、数値や語句を変えた類題を${n}問作る。
+条件：元の問題と答えが同じにならない。一問一答で、答えは短く手書きできる形。正解は必ず検算する。分数は約分、根号は簡単にする。
+元の問題:${stripTags(q[0])}
+元の正解:${q[1]}
+JSONのみ:{"items":[{"q":"問題文","a":"正解"}]}`;
+  try{
+    const r = await callGemini((store.modelRead||"gemini-flash-latest").trim(), prompt, null, 4096, "low");
+    return (r.items||[]).filter(x=>x&&x.q&&x.a);
+  }catch(e){ return []; }
+}
+async function renderTrain(){
+  const it = cur.queue[cur.tpos];
+  document.getElementById("qCount").textContent = `${cur.tpos+1} / ${cur.queue.length}`;
+  document.getElementById("qProg").style.width = (cur.tpos/cur.queue.length*100)+"%";
+  const qt = document.getElementById("qText"), qs = document.getElementById("qSetName");
+  prepareQ();
+
+  if(it.kind==="write"){
+    if(it.phase==="study"){
+      qs.textContent = "書き取り練習　①見て覚える";
+      qt.innerHTML = `${it.q[0]}<div class="ansbox">${it.q[1]}</div><div class="inst">正しい形をよく見て覚えよう。覚えたら「見ないで書く」へ。</div>`;
+      document.getElementById("padWrap").classList.add("hidden");
+      const gb = document.getElementById("gradeBtn"); gb.textContent = "覚えた → 見ないで書く";
+      gb.onclick = ()=>{ it.phase="write"; renderTrain(); };
+      return;
+    }
+    qs.textContent = `書き取り練習　②見ないで${store.writeN}回書く`;
+    qt.innerHTML = `${it.q[0]}<div class="inst">答えを <b>1行に1つずつ、${store.writeN}回</b> 書こう。</div>`;
+    setPadRows(store.writeN); clearPad();
+    return;
+  }
+  setPadRows(0);
+  if(it.kind==="sim" && !it.q){
+    qs.textContent = "類題を準備中…"; qt.innerHTML = '<span class="spinner" style="border-color:var(--c);border-top-color:transparent"></span> AIが類題を作っています';
+    const gb = document.getElementById("gradeBtn"); gb.disabled = true;
+    const items = await it.gen;
+    if(cur.mode!=="train" || cur.queue[cur.tpos]!==it) return;
+    const x = items[it.k];
+    if(x) it.q = [x.q, x.a];
+    else { it.kind = "retry"; it.q = it.base; }
+    return renderTrain();
+  }
+  qs.textContent = it.kind==="sim" ? `類題 ${it.k+1}（AI作成）` : "もう一度チャレンジ";
+  qt.innerHTML = it.q[0];
+}
+async function gradeWrite(){
+  const it = cur.queue[cur.tpos], N = store.writeN;
+  const img = exportImage();
+  locked = true; document.getElementById("padWrap").classList.add("locked");
+  const gb = document.getElementById("gradeBtn"); gb.disabled = true;
+  const box = document.getElementById("resBox");
+  const retryBtns = `<button class="btn primary" onclick="rewrite()">もう一度覚え直す</button><button class="btn" onclick="giveUp()">次へ進む</button>`;
+  if(!store.key){
+    document.getElementById("tools").classList.add("hidden");
+    box.innerHTML = `<div class="res"><div class="row"><b>正解</b><span style="font-size:22px;font-weight:700">${it.q[1]}</span></div>
+      <div class="cmt">${N}回とも正しく書けたか確認しよう。</div>
+      <div class="fix"><button class="btn ok" onclick="writeDone(true)">○ 全部書けた</button><button class="btn ng" onclick="rewrite()">× もう一度</button></div></div>`;
+    return;
+  }
+  gb.innerHTML = '<span class="spinner"></span>確認中…';
+  let lines = [];
+  try{
+    const prompt =
+`1行に1つずつ書かれた手書き文字を、上の行から順に一字一句そのまま書き起こす。誤字・つづり誤りも直さず、推測で補わない。読めない字は?。
+文字種:${it.st.hint||"漢字・ひらがな・カタカナ・英字"}
+JSONのみ:{"lines":["1行目","2行目"]}`;
+    const r = await callGemini((store.modelRead||"gemini-flash-latest").trim(), prompt, img, 300);
+    lines = (r.lines||[]).map(String).filter(l=>l.trim());
+  }catch(err){
+    document.getElementById("tools").classList.add("hidden");
+    box.innerHTML = `<div class="res"><div class="cmt">AIの確認に失敗しました（${esc(err.message)}）。</div>
+      <div class="row"><b>正解</b><span style="font-weight:700">${it.q[1]}</span></div>
+      <div class="fix"><button class="btn ok" onclick="writeDone(true)">○ 全部書けた</button><button class="btn ng" onclick="rewrite()">× もう一度</button></div></div>`;
+    return;
+  }
+  const marks = lines.map(l=>exactMatch(l, it.q));
+  const okN = marks.filter(Boolean).length;
+  const pass = okN>=N;
+  it.rec = { q:it.q[0], answer:it.q[1], img, read:lines.join(" / "), correct:pass };
+  document.getElementById("tools").classList.add("hidden");
+  const auto = pass && store.autoNext>0;
+  box.innerHTML = `<div class="res ${pass?"ok":"ng"}">
+    <div><span class="mark">${pass?"○":"×"}</span><span style="font-weight:700">${pass?`${N}回とも正しく書けた！`:`正しく書けたのは ${okN} / ${N}回`}</span></div>
+    <div class="lines">${lines.map((l,i)=>`${marks[i]?"○":"×"} ${esc(l)}`).join("<br>")||"（読み取れず）"}</div>
+    <div class="row"><b>正解</b><span style="font-weight:700">${it.q[1]}</span></div>
+    <div class="fix">${pass?`<button class="btn primary" onclick="nextQ()">${nextLabel()}</button>`:retryBtns}
+      ${pass?"":`<button class="btn" onclick="writeDone(true)">読み間違い：書けていた</button>`}</div>
+    ${auto?`<div class="autobar"><i style="animation-duration:${store.autoNext}s"></i></div>`:""}
+  </div>`;
+  if(auto) autoTimer = setTimeout(nextQ, store.autoNext*1000);
+}
+function writeDone(ok){ const it=cur.queue[cur.tpos]; it.rec = Object.assign(it.rec||{q:it.q[0],answer:it.q[1],read:"（自己確認）"}, {correct:ok}); nextQ(); }
+function rewrite(){ const it=cur.queue[cur.tpos]; it.tries++; it.phase="study"; setPadRows(0); renderTrain(); }
+function giveUp(){ const it=cur.queue[cur.tpos]; it.rec = Object.assign(it.rec||{q:it.q[0],answer:it.q[1],read:""}, {correct:false}); nextQ(); }
+function trainNext(){
+  if(cur.tpos < cur.queue.length-1){ cur.tpos++; setPadRows(0); renderTrain(); }
+  else finishTrain();
+}
+function finishTrain(){
+  setPadRows(0);
+  const items = cur.queue.filter(it=>it.rec);
+  const ok = items.filter(it=>it.rec.correct).length;
+  document.getElementById("rTitle").textContent = `${curSubj().name}　${setTitle()}　弱点トレーニング`;
+  document.getElementById("rScore").innerHTML = `${ok}<small> / ${items.length}</small>`;
+  document.getElementById("rBest").textContent = ok===items.length ? "全部クリア！ 弱点をつぶせました。" : "まだ不安なものは、8日目以降の「今日の10問」で優先して出題されます。";
+  document.getElementById("rTrain").innerHTML = "";
+  fillTable(items.map(it=>({ mark:it.rec.correct,
+    label:(it.kind==="write"?"【書き取り】":it.kind==="sim"?"【類題】":"【再挑戦】")+it.q[0],
+    img:it.rec.img, read:it.rec.read, answer:it.q[1] })));
+  addStudy(Date.now()-(cur.t1||Date.now())); syncDay();
+  cur.mode = "done"; tick();
+  show("result");
+}
+
+/* ============================================================
+   設定
+   ============================================================ */
+function openSettings(){
+  document.getElementById("sKey").value = store.key||"";
+  document.getElementById("sModelRead").value = store.modelRead||"gemini-flash-latest";
+  document.getElementById("sModelJudge").value = store.modelJudge||"gemini-flash-lite-latest";
+  document.getElementById("sPen").checked = !!store.penOnly;
+  document.getElementById("sTime").value = String(store.timeScale);
+  document.getElementById("sTimeUp").value = store.timeUp;
+  document.getElementById("sAuto").value = String(store.autoNext);
+  document.getElementById("sWriteN").value = String(store.writeN);
+  document.getElementById("sSimN").value = String(store.simN);
+  document.getElementById("sSync").value = store.syncUrl||"";
+  document.getElementById("sSyncToken").value = store.syncToken||"";
+  fillVoiceSelect();
+  document.getElementById("sRate").value = String(store.rate||1);
+  document.getElementById("sPitch").value = String(store.pitch||1.15);
+  document.getElementById("settings").classList.remove("hidden");
+}
+function closeSettings(){ document.getElementById("settings").classList.add("hidden"); }
+function saveSettings(){
+  store.key = document.getElementById("sKey").value.trim();
+  store.modelRead = document.getElementById("sModelRead").value.trim()||"gemini-flash-latest";
+  store.modelJudge = document.getElementById("sModelJudge").value.trim()||"gemini-flash-lite-latest";
+  store.penOnly = document.getElementById("sPen").checked;
+  store.timeScale = +document.getElementById("sTime").value;
+  store.timeUp = document.getElementById("sTimeUp").value;
+  store.autoNext = +document.getElementById("sAuto").value;
+  store.writeN = +document.getElementById("sWriteN").value;
+  store.simN = +document.getElementById("sSimN").value;
+  store.syncUrl = document.getElementById("sSync").value.trim();
+  store.syncToken = document.getElementById("sSyncToken").value.trim();
+  store.voice = document.getElementById("sVoice").value;
+  store.rate = +document.getElementById("sRate").value;
+  store.pitch = +document.getElementById("sPitch").value;
+  save(); closeSettings(); renderHome();
+}
+function resetPlan(){ if(confirm("今日のメニューの進み具合をリセットしますか？（解いた記録は残ります）")){ delete store.days[todayStr()]; save(); closeSettings(); renderHome(); } }
+function resetScores(){ if(confirm("すべての成績と記録を消去しますか？")){ store.best={}; store.qstat={}; store.hist={}; store.att=[]; store.days={}; save(); renderHome(); } }
+
+renderHome();
+</script>
+</body>
+</html>
